@@ -1,5 +1,5 @@
 <?php
-  $root_path = basename($_GET['zip-dir']);
+  $root_path = basename($_GET['dir']);
 
   $zip = new ZipArchive();
   $zip->open('data-mule.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
