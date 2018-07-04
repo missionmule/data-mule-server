@@ -28,12 +28,12 @@
       $sensor_data_files = scandir($sensor_data_dir);
       $sensor_data_files = array_diff($sensor_data_files, array('.', '..')); # Remove . and ..
 
-      echo "<h1>Sensor Data</h1>"
+      echo "<h1>Sensor Data</h1>";
       foreach($sensor_data_files as $file) {
         echo "<a href='download.php?file=".$file."'>".$file."</a><br>";
       }
 
-      echo "<h1>Logs</h1>"
+      echo "<h1>Logs</h1>";
       foreach($sensor_log_files as $file) {
         echo "<a href='download.php?file=".$file."'>".$file."</a><br>";
       }
