@@ -30,7 +30,7 @@
 
       echo "<h1>Sensor Data</h1>";
       foreach($sensor_data_files as $file) {
-        echo "<a href='download.php?file=".$file."&path=".$sensor_data_dir."'>".$file."</a><br>";
+        echo "<a href='download.php?file=".$file."&amp;path=".$sensor_data_dir."'>".$file."</a><br>";
       }
 
       echo "<h1>Logs</h1>";
