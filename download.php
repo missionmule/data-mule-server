@@ -3,7 +3,7 @@
   $path = basename($_GET['path']);
 
   echo "File: ".$filename;
-  echo "Path: ".$path
+  echo "Path: ".$path;
 
 
   $download_file = $path.$filename;
