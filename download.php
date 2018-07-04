@@ -1,12 +1,8 @@
 <?php
   $filename = basename($_GET['file']);
-  $path = rawurldecode(basename($_GET['path']));
+  $path = basename($_GET['path']);
 
-  echo "File: ".$filename;
-  echo "Path: ".$path;
-
-
-  $download_file = $path.$filename;
+  $download_file = "/src/".$path."/".$filename;
 
   if (!empty($filename)){
     // Check if file exists
