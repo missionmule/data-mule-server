@@ -35,7 +35,7 @@
 
       echo "<h1>Logs</h1>";
       foreach($sensor_log_files as $file) {
-        echo "<a href='download.php?file=".$file."&amp;path=logs)."'>".$file."</a><br>";
+        echo "<a href='download.php?file=".$file."&amp;path=logs'>".$file."</a><br>";
       }
 
       echo "<a href='zip.php?dir=".$sensor_data_dir."'>Download</a><br>";
