@@ -2,6 +2,10 @@
   $filename = basename($_GET['file']);
   $path = basename($_GET['path']);
 
+  echo "File: ".$filename;
+  echo "Path: ".$path
+
+
   $download_file = $path.$filename;
 
   if (!empty($filename)){
