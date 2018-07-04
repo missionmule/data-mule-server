@@ -1,5 +1,8 @@
 <?php
-  $download_file = basename($_GET['file']);
+  $filename = basename($_GET['file']);
+  $path = basename($_GET['path']);
+
+  $download_file = $path.$filename;
 
   if (!empty($filename)){
     // Check if file exists
