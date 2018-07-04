@@ -1,6 +1,6 @@
 <?php
   $filename = basename($_GET['file']);
-  $path = basename($_GET['path']);
+  $path = rawurldecode(basename($_GET['path']));
 
   echo "File: ".$filename;
   echo "Path: ".$path;
