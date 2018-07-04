@@ -20,7 +20,7 @@
          and makes the data available for download on the client. */
 
       $sensor_log_dir = "/srv/logs/";
-      $sensor_data_dir = "/srv/";
+      $sensor_data_dir = "/srv/data/";
 
       $sensor_log_files = scandir($sensor_log_dir);
       $sensor_log_files = array_diff($sensor_log_files, array('.', '..')); # Remove . and ..
@@ -31,6 +31,8 @@
       foreach($sensor_data_files as $file) {
         echo "<a href='download.php?file=".$file."'>".$file."</a><br>";
       }
+
+      echo "<a href='zip.php'?zip-dir=".$sensor_data_dir."'>Download</a><br>";
      ?>
   </body>
 </html>
