@@ -3,7 +3,7 @@
      and makes the data available for download on the client. */
 
   $sensor_log_dir = "/srv/logs/";
-  $sensor_data_dir = "/srv/data/";
+  $sensor_data_dir = "/srv/";
 
   $sensor_log_files = scandir($sensor_log_dir);
   $sensor_log_files = array_diff($sensor_log_files, array('.', '..')); # Remove . and ..
