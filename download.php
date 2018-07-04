@@ -2,7 +2,7 @@
   $filename = basename($_GET['file']);
   $path = basename($_GET['path']);
 
-  $download_file = "/src/".$path."/".$filename;
+  $download_file = "/srv/".$path."/".$filename;
 
   if (!empty($filename)){
     // Check if file exists
