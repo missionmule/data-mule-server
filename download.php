@@ -1,8 +1,5 @@
 <?php
-  $filename = basename($_GET['file']);
-  $path = '/srv/';
-
-  $download_file = $path.$filename;
+  $download_file = basename($_GET['file']);
 
   if (!empty($filename)){
     // Check if file exists
