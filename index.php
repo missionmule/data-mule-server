@@ -38,7 +38,7 @@
         echo "<a href='download.php?file=".$file."'>".$file."</a><br>";
       }
 
-      // echo "<a href='zip.php'?dir=".$sensor_data_dir."'>Download</a><br>";
+      echo "<a href='zip.php?dir=".$sensor_data_dir."'>Download</a><br>";
      ?>
   </body>
 </html>
