@@ -3,7 +3,7 @@
   $path = basename($_GET['path']);
 
   echo "File: ".$filename;
-  echo "Path: ".json_decode($path);
+  echo "Path: ".json_encode($path, JSON_UNESCAPED_SLASHES);
 
 
   $download_file = $path.$filename;
