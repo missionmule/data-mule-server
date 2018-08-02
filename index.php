@@ -2,7 +2,7 @@
 // Create ZIP file
 if(isset($_POST['create'])){
  $zip = new ZipArchive();
- $filename = "/tmp/myzipfile.zip";
+ $filename = "/tmp/flight-data.zip";
 
  if ($zip->open($filename, ZipArchive::CREATE)!==TRUE) {
   exit("cannot open <$filename>\n");
@@ -56,7 +56,7 @@ function createZip($zip,$dir){
 // Download Created Zip file
 if(isset($_POST['download'])){
 
- $filename = "/tmp/myzipfile.zip";
+ $filename = "/tmp/flight-data.zip";
 
  if (file_exists($filename)) {
   header('Content-Type: application/zip');
