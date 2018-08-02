@@ -56,7 +56,7 @@ function createZip($zip,$dir){
 // Download Created Zip file
 if(isset($_POST['download'])){
 
- $filename = "myzipfile.zip";
+ $filename = "/tmp/myzipfile.zip";
 
  if (file_exists($filename)) {
   header('Content-Type: application/zip');
