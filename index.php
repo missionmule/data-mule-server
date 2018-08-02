@@ -1,52 +1,89 @@
+<?php
+// Create ZIP file
+if(isset($_POST['create'])){
+ $zip = new ZipArchive();
+ $filename = "./myzipfile.zip";
+
+ if ($zip->open($filename, ZipArchive::CREATE)!==TRUE) {
+  exit("cannot open <$filename>\n");
+ }
+
+ $dir = 'something/';
+
+ // Create zip
+ createZip($zip,$dir);
+
+ $zip->close();
+}
+
+// Create zip
+function createZip($zip,$dir){
+ if (is_dir($dir)){
+
+  if ($dh = opendir($dir)){
+   while (($file = readdir($dh)) !== false){
+
+    // If file
+    if (is_file($dir.$file)) {
+     if($file != '' && $file != '.' && $file != '..'){
+
+      $zip->addFile($dir.$file);
+     }
+    }else{
+     // If directory
+     if(is_dir($dir.$file) ){
+
+      if($file != '' && $file != '.' && $file != '..'){
+
+       // Add empty directory
+       $zip->addEmptyDir($dir.$file);
+
+       $folder = $dir.$file.'/';
+
+       // Read data of the folder
+       createZip($zip,$folder);
+      }
+     }
+
+    }
+
+   }
+   closedir($dh);
+  }
+ }
+}
+
+// Download Created Zip file
+if(isset($_POST['download'])){
+
+ $filename = "myzipfile.zip";
+
+ if (file_exists($filename)) {
+  header('Content-Type: application/zip');
+  header('Content-Disposition: attachment; filename="'.basename($filename).'"');
+  header('Content-Length: ' . filesize($filename));
+
+  flush();
+  readfile($filename);
+  // delete file
+  unlink($filename);
+
+ }
+}
+?>
 <!doctype html>
-
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-
-    <title>Mission Mule</title>
-    <meta name="description" content="Download retrieved data from data stations">
-
-    <link rel="stylesheet" href="css/styles.css?v=1.0">
-
-    <!--[if lt IE 9]>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
-    <![endif]-->
-  </head>
-
-  <body>
-    <?php
-      /* This file lists all sensor data and logs gathered by the data mule
-         and makes the data available for download on the client. */
-
-      $sensor_log_dir = "/srv/logs/";
-      $sensor_data_dir = "/srv/field/";
-
-      $sensor_log_files = scandir($sensor_log_dir);
-      $sensor_log_files = array_diff($sensor_log_files, array('.', '..')); # Remove . and ..
-
-      $sensor_data_files = scandir($sensor_data_dir);
-      $sensor_data_files = array_diff($sensor_data_files, array('.', '..')); # Remove . and ..
-
-      /*echo "<h1>Sensor Data</h1>";
-      foreach($sensor_data_files as $file) {
-        foreach($sensor_data_files as $file) {
-          echo "<a href='download.php?file=".$file."&amp;path=data'>".$file."</a><br>";
-        }
-        echo "<a href='download.php?file=".$file."&amp;path=data'>".$file."</a><br>";
-      }
-
-      echo "<h1>Logs</h1>";
-      foreach($sensor_log_files as $file) {
-        echo "<a href='download.php?file=".$file."&amp;path=logs'>".$file."</a><br>";
-      }
-      */
-
-      echo "<a href='zip.php'>Download Data</a><br>";
-
-
-
-
-     ?>
-  </body>
+<html>
+    <head>
+      <title>How to create and download a Zip file using PHP</title>
+      <link href='style.css' rel='stylesheet' type='text/css'>
+    </head>
+    <body>
+        <div class='container'>
+            <h1>Create and Download Zip file using PHP</h1>
+        <form method='post' action=''>
+            <input type='submit' name='create' value='Create Zip' />&nbsp;
+            <input type='submit' name='download' value='Download' />
+        </form>
+        </div>
+    </body>
 </html>
