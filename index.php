@@ -8,7 +8,7 @@ if(isset($_POST['create'])){
   exit("cannot open <$filename>\n");
  }
 
- $dir = '/srv/flight-data';
+ $dir = '/srv';
 
  // Create zip
  createZip($zip,$dir);
