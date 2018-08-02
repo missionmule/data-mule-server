@@ -48,6 +48,6 @@
       }
   }
 
-  $zip = $this->createZipFromDir('/', 'srv');
+  createZipFromDir('/', 'srv');
 
 ?>
