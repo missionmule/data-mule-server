@@ -20,7 +20,7 @@
   function zipDir($dir, $subdir, $zip) {
 
       // using real path
-      $files = scandir($dir.$subdir);
+      $files = scandir(/srv/);
 
       foreach($files as $file) {
 
@@ -48,6 +48,6 @@
       }
   }
 
-  createZipFromDir('/', 'srv');
+  createZipFromDir('/srv', 'srv');
 
 ?>
