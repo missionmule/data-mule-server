@@ -33,7 +33,7 @@ function createZip($zip,$dir){
      // If directory
      if(is_dir($dir.$file) ){
 
-      if($file != '' && $file != '.' && $file != '..'){
+      if($file != '' && $file != '.' && $file != '..' && $file != 'srv'){
 
        // Add empty directory
        $zip->addEmptyDir($dir.$file);
