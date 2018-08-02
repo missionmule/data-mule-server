@@ -2,13 +2,13 @@
 // Create ZIP file
 if(isset($_POST['create'])){
  $zip = new ZipArchive();
- $filename = "/tmp/flight-data.zip";
+ $filename = "/tmp/myzipfile.zip";
 
  if ($zip->open($filename, ZipArchive::CREATE)!==TRUE) {
   exit("cannot open <$filename>\n");
  }
 
- $dir = '/srv/flight-data';
+ $dir = '/srv';
 
  // Create zip
  createZip($zip,$dir);
@@ -56,7 +56,7 @@ function createZip($zip,$dir){
 // Download Created Zip file
 if(isset($_POST['download'])){
 
- $filename = "/tmp/flight-data.zip";
+ $filename = "/tmp/myzipfile.zip";
 
  if (file_exists($filename)) {
   header('Content-Type: application/zip');
@@ -74,12 +74,12 @@ if(isset($_POST['download'])){
 <!doctype html>
 <html>
     <head>
-      <title>Download Flight Data</title>
+      <title>How to create and download a Zip file using PHP</title>
       <link href='style.css' rel='stylesheet' type='text/css'>
     </head>
     <body>
         <div class='container'>
-            <h1>Create and Download UAS Data</h1>
+            <h1>Create and Download Zip file using PHP</h1>
         <form method='post' action=''>
             <input type='submit' name='create' value='Create Zip' />&nbsp;
             <input type='submit' name='download' value='Download' />
