@@ -1,47 +1,48 @@
 <?php
 
-  $root_path = basename($_GET['dir']);
+$dir = "/srv"
+$zip_file = 'file.zip';
 
-  $zipname = 'MissionData.zip';
-  $zip = new ZipArchive;
-  $zip->open($zipname, ZipArchive::CREATE);
-  if ($handle = opendir($root_path)) {
-    while (false !== ($entry = readdir($handle))) {
-      if ($entry != "." && $entry != ".." && !strstr($entry,'.php')) {
-          $zip->addFile($entry);
-      }
+// Get real path for our folder
+$rootPath = realpath($dir);
+
+// Initialize archive object
+$zip = new ZipArchive();
+$zip->open($zip_file, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+// Create recursive directory iterator
+/** @var SplFileInfo[] $files */
+$files = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($rootPath),
+    RecursiveIteratorIterator::LEAVES_ONLY
+);
+
+foreach ($files as $name => $file)
+{
+    // Skip directories (they would be added automatically)
+    if (!$file->isDir())
+    {
+        // Get real and relative path for current file
+        $filePath = $file->getRealPath();
+        $relativePath = substr($filePath, strlen($rootPath) + 1);
+
+        // Add current file to archive
+        $zip->addFile($filePath, $relativePath);
     }
-    closedir($handle);
-  }
+}
 
-  $zip->close();
+// Zip archive will be created only after closing object
+$zip->close();
 
-  header('Content-Type: application/zip');
-  header("Content-Disposition: attachment; filename='MissionData.zip'");
-  header('Content-Length: ' . filesize($zipname));
-  header("Location: MissionData.zip");
+
+header('Content-Description: File Transfer');
+header('Content-Type: application/octet-stream');
+header('Content-Disposition: attachment; filename='.basename($zip_file));
+header('Content-Transfer-Encoding: binary');
+header('Expires: 0');
+header('Cache-Control: must-revalidate');
+header('Pragma: public');
+header('Content-Length: ' . filesize($zip_file));
+readfile($zip_file);
 
 ?>
-
-  <!-- $root_path = basename($_GET['dir']);
-
-
-
-  $zip = new ZipArchive();
-  $zip->open('data-mule.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
-
-  $files = new RecursiveIteratorIterator(
-    new RecursiveDirectoryIterator($root_path),
-    RecursiveIteratorIterator::LEAVES_ONLY
-  );
-
-  foreach ($files as $name => $file) {
-    if (!$file->isDir()){
-      $file_path = $file->getRealPath();
-      $relative_path = substr($file_path, strlen($root_path) + 1);
-
-      $zip->addFile($file_path, $relative_path);
-    }
-  }
-  $zip->close();
-?> -->

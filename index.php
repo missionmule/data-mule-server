@@ -42,7 +42,7 @@
       }
       */
 
-      echo "<a href='zip.php?dir=/srv/'>Download Data</a><br>";
+      echo "<a href='zip.php?dir=/srv'>Download Data</a><br>";
 
 
      ?>
