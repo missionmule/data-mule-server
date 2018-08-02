@@ -1,9 +1,11 @@
 <?php
 
+  $root_path = basename($_GET['dir']);
+
   $zipname = 'MissionData.zip';
   $zip = new ZipArchive;
   $zip->open($zipname, ZipArchive::CREATE);
-  if ($handle = opendir('.')) {
+  if ($handle = opendir($root_path)) {
     while (false !== ($entry = readdir($handle))) {
       if ($entry != "." && $entry != ".." && !strstr($entry,'.php')) {
           $zip->addFile($entry);
@@ -15,7 +17,7 @@
   $zip->close();
 
   header('Content-Type: application/zip');
-  header("Content-Disposition: attachment; filename='adcs.zip'");
+  header("Content-Disposition: attachment; filename='MissionData.zip'");
   header('Content-Length: ' . filesize($zipname));
   header("Location: MissionData.zip");
 
