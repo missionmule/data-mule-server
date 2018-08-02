@@ -8,7 +8,7 @@ if(isset($_POST['create'])){
   exit("cannot open <$filename>\n");
  }
 
- $dir = '/var/www/html/something/';
+ $dir = '/srv/';
 
  // Create zip
  createZip($zip,$dir);
