@@ -2,13 +2,13 @@
 // Create ZIP file
 if(isset($_POST['create'])){
  $zip = new ZipArchive();
- $filename = "./myzipfile.zip";
+ $filename = "/tmp/myzipfile.zip";
 
  if ($zip->open($filename, ZipArchive::CREATE)!==TRUE) {
   exit("cannot open <$filename>\n");
  }
 
- $dir = './something/';
+ $dir = '/var/www/html/something/';
 
  // Create zip
  createZip($zip,$dir);
