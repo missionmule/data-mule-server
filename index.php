@@ -70,6 +70,30 @@ if(isset($_POST['download'])){
 
  }
 }
+
+// Clear download data
+if(isset($_POST['delete'])){
+
+  function rrmdir($src) {
+    $dir = opendir($src);
+    while(false !== ( $file = readdir($dir)) ) {
+        if (( $file != '.' ) && ( $file != '..' )) {
+            $full = $src . '/' . $file;
+            if ( is_dir($full) ) {
+                rrmdir($full);
+            }
+            else {
+                unlink($full);
+            }
+        }
+    }
+    closedir($dir);
+    rmdir($src);
+  }
+
+  rrmdir('/tmp/flight-data')
+}
+
 ?>
 <!doctype html>
 <html>
@@ -82,7 +106,8 @@ if(isset($_POST['download'])){
             <h1>Download UAS Data</h1>
         <form method='post' action=''>
             <input type='submit' name='create' value='Create Zip' />&nbsp;
-            <input type='submit' name='download' value='Download' />
+            <input type='submit' name='download' value='Download' />&nbsp;
+            <input type='submit' name='delete' value='Delete All Data' />&nbsp;
         </form>
         </div>
     </body>
