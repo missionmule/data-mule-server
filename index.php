@@ -91,7 +91,7 @@ if(isset($_POST['delete'])){
     rmdir($src);
   }
 
-  rrmdir('/tmp/flight-data')
+  rrmdir('/tmp/flight-data');
 }
 
 ?>
