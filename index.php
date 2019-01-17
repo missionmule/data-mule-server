@@ -14,6 +14,20 @@ if(isset($_POST['create'])){
  createZip($zip,$dir);
 
  $zip->close();
+
+ $filename = "/tmp/flight-data.zip";
+
+ if (file_exists($filename)) {
+  header('Content-Type: application/zip');
+  header('Content-Disposition: attachment; filename="'.basename($filename).'"');
+  header('Content-Length: ' . filesize($filename));
+
+  flush();
+  readfile($filename);
+  // delete file
+  unlink($filename);
+
+ }
 }
 
 // Create zip
@@ -53,23 +67,23 @@ function createZip($zip,$dir){
  }
 }
 
-// Download Created Zip file
-if(isset($_POST['download'])){
-
- $filename = "/tmp/flight-data.zip";
-
- if (file_exists($filename)) {
-  header('Content-Type: application/zip');
-  header('Content-Disposition: attachment; filename="'.basename($filename).'"');
-  header('Content-Length: ' . filesize($filename));
-
-  flush();
-  readfile($filename);
-  // delete file
-  unlink($filename);
-
- }
-}
+// // Download Created Zip file
+// if(isset($_POST['download'])){
+//
+//  $filename = "/tmp/flight-data.zip";
+//
+//  if (file_exists($filename)) {
+//   header('Content-Type: application/zip');
+//   header('Content-Disposition: attachment; filename="'.basename($filename).'"');
+//   header('Content-Length: ' . filesize($filename));
+//
+//   flush();
+//   readfile($filename);
+//   // delete file
+//   unlink($filename);
+//
+//  }
+// }
 
 // Clear download data
 if(isset($_POST['delete'])){
@@ -91,7 +105,7 @@ if(isset($_POST['delete'])){
     rmdir($src);
   }
 
-  rrmdir('/tmp/flight-data');
+  rrmdir('/srv/flight-data');
 }
 
 ?>
