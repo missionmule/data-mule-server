@@ -67,24 +67,6 @@ function createZip($zip,$dir){
  }
 }
 
-// // Download Created Zip file
-// if(isset($_POST['download'])){
-//
-//  $filename = "/tmp/flight-data.zip";
-//
-//  if (file_exists($filename)) {
-//   header('Content-Type: application/zip');
-//   header('Content-Disposition: attachment; filename="'.basename($filename).'"');
-//   header('Content-Length: ' . filesize($filename));
-//
-//   flush();
-//   readfile($filename);
-//   // delete file
-//   unlink($filename);
-//
-//  }
-// }
-
 // Clear download data
 if(isset($_POST['delete'])){
 
@@ -119,8 +101,7 @@ if(isset($_POST['delete'])){
         <div class='container'>
             <h1>Download UAS Data</h1>
         <form method='post' action=''>
-            <input type='submit' name='create' value='Create Zip' />&nbsp;
-            <input type='submit' name='download' value='Download' />&nbsp;
+            <input type='submit' name='create' value='Download All Data' />&nbsp;
             <input type='submit' name='delete' value='Delete All Data' />&nbsp;
         </form>
         </div>
