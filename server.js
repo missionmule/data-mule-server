@@ -28,8 +28,11 @@ app.get('/api/download', (req, res) => {
   var archive = archiver('zip');
 
   output.on('close', function () {
+    console.log("Zipping complete");
 
     const src = fs.createReadStream('./data.zip');
+
+    console.log("Beginning download...");
 
     // Pipe read stream to client
     src.pipe(res);
@@ -58,30 +61,31 @@ app.get('/api/download', (req, res) => {
 
 app.get('/api/delete', (req, res) => {
 
-  console.log("Clearing download directory");
+  console.log("Emptying download directory...");
 
-  var deleteFolderRecursive = function(path) {
-    if( fs.existsSync(path) ) {
-      fs.readdirSync(path).forEach(function(file,index){
-        var curPath = path + "/" + file;
-        if(fs.lstatSync(curPath).isDirectory()) { // recurse
-          deleteFolderRecursive(curPath);
-        } else { // delete file
-          fs.unlinkSync(curPath);
-        }
-      });
-      fs.rmdirSync(path);
-    }
-  };
+  // var deleteFolderRecursive = function(path) {
+  //   if( fs.existsSync(path) ) {
+  //     fs.readdirSync(path).forEach(function(file,index){
+  //       var curPath = path + "/" + file;
+  //       if(fs.lstatSync(curPath).isDirectory()) { // recurse
+  //         deleteFolderRecursive(curPath);
+  //       } else { // delete file
+  //         fs.unlinkSync(curPath);
+  //       }
+  //     });
+  //     fs.rmdirSync(path);
+  //   }
+  // };
+  //
+  // deleteFolderRecursive('./download/');
 
-  deleteFolderRecursive('./download/');
+  // // Create a clean, empty directory
+  // fs.mkdirSync('./download/');
 
-  // Create a clean, empty directory
-  fs.mkdirSync('./download/');
+  console.log("Download directory emptied");
 
   // Let the client know that the request is complete
   res.sendStatus(200);
 });
-
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

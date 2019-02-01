@@ -11,6 +11,7 @@ class App extends Component {
     post: '',
     responseToPost: '',
     deleteInProgress: false,
+    downloadInProgress: false,
   };
   componentDidMount() {
     this.callApi()
@@ -18,6 +19,7 @@ class App extends Component {
       .catch(err => console.log(err));
   }
 
+  // Verifies that the API is up and running
   callApi = async () => {
     const response = await fetch('/api/hello');
     const body = await response.json();
@@ -41,54 +43,45 @@ class App extends Component {
   handleDownloadRequest = async (e: any) => {
     e.preventDefault();
 
+    this.setState({ downloadInProgress: true });
+
     axios({
       url: '/api/download',
       method: 'GET',
-      responseType: 'blob', // important
+      responseType: 'blob',
     }).then((response) => {
-       const url = window.URL.createObjectURL(new Blob([response.data]));
-       const link = document.createElement('a');
-       link.href = url;
-       link.setAttribute('download', 'MissionMule.zip'); //or any other extension
-       document.body.appendChild(link);
-       link.click();
+      if (response.data.size <= 22) {
+        console.log("Nothing to download");
+      } else {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'MissionMule.zip'); //or any other extension
+        document.body.appendChild(link);
+        link.click();
+      }
     });
 
-  }
+    this.setState({ downloadInProgress: false });
+
+  };
 
   handleDeleteRequest = async (e: any) => {
     e.preventDefault();
+    console.log("in handleDeleteRequest")
 
     this.setState({ deleteInProgress: true });
-    const response = await fetch('/api/delete', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-    const body = await response.status;
-    if (body !== 200) { console.log("Delete error") }
+
+    const response = await fetch('/api/delete');
+    const body = await response;
+    if (response.status !== 200) throw Error("Delete failure");
+
     this.setState({ deleteInProgress: false });
   };
 
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.tsx</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-        <p>{this.state.response}</p>
         <form onSubmit={this.handleSubmit}>
           <p>
             <strong>Post to Server:</strong>
