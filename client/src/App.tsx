@@ -13,6 +13,7 @@ class App extends Component {
     deleteInProgress: false,
     downloadInProgress: false,
   };
+
   componentDidMount() {
     this.callApi()
       .then(res => this.setState({ response: res.express }))
@@ -103,6 +104,7 @@ class App extends Component {
       </div>
     );
   }
+
 }
 
 export default App;

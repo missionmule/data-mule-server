@@ -63,24 +63,24 @@ app.get('/api/delete', (req, res) => {
 
   console.log("Emptying download directory...");
 
-  // var deleteFolderRecursive = function(path) {
-  //   if( fs.existsSync(path) ) {
-  //     fs.readdirSync(path).forEach(function(file,index){
-  //       var curPath = path + "/" + file;
-  //       if(fs.lstatSync(curPath).isDirectory()) { // recurse
-  //         deleteFolderRecursive(curPath);
-  //       } else { // delete file
-  //         fs.unlinkSync(curPath);
-  //       }
-  //     });
-  //     fs.rmdirSync(path);
-  //   }
-  // };
-  //
-  // deleteFolderRecursive('./download/');
+  var deleteFolderRecursive = function(path) {
+    if( fs.existsSync(path) ) {
+      fs.readdirSync(path).forEach(function(file,index){
+        var curPath = path + "/" + file;
+        if(fs.lstatSync(curPath).isDirectory()) { // recurse
+          deleteFolderRecursive(curPath);
+        } else { // delete file
+          fs.unlinkSync(curPath);
+        }
+      });
+      fs.rmdirSync(path);
+    }
+  };
 
-  // // Create a clean, empty directory
-  // fs.mkdirSync('./download/');
+  deleteFolderRecursive('./download/');
+
+  // Create a clean, empty directory
+  fs.mkdirSync('./download/');
 
   console.log("Download directory emptied");
 
