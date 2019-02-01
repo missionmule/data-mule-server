@@ -69,13 +69,18 @@ class App extends Component {
 
   handleDeleteRequest = async (e: any) => {
     e.preventDefault();
-    console.log("in handleDeleteRequest")
 
     this.setState({ deleteInProgress: true });
 
     const response = await fetch('/api/delete');
     const body = await response;
-    if (response.status !== 200) throw Error("Delete failure");
+
+    // Custom HTTP response code for 'Nothing to delete'
+    if (response.status === 540) {
+      console.log("Nothing to delete");
+    } else if (response.status !== 200) {
+       throw Error("Delete failure");
+    }
 
     this.setState({ deleteInProgress: false });
   };

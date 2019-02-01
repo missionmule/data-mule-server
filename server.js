@@ -63,29 +63,38 @@ app.get('/api/delete', (req, res) => {
 
   console.log("Emptying download directory...");
 
-  var deleteFolderRecursive = function(path) {
-    if( fs.existsSync(path) ) {
-      fs.readdirSync(path).forEach(function(file,index){
-        var curPath = path + "/" + file;
-        if(fs.lstatSync(curPath).isDirectory()) { // recurse
-          deleteFolderRecursive(curPath);
-        } else { // delete file
-          fs.unlinkSync(curPath);
-        }
-      });
-      fs.rmdirSync(path);
-    }
-  };
+  var files = fs.readdirSync('./download/');
 
-  deleteFolderRecursive('./download/');
+  // Custom HTTP response code for 'Nothing to delete'
+  if (files.length == 0) {
+    console.log("Nothing to delete");
+    res.statusMessage = "Nothing to delete";
+    res.status(540).end();
+  } else {
+    var deleteFolderRecursive = function(path) {
+      if( fs.existsSync(path) ) {
+        fs.readdirSync(path).forEach(function(file,index){
+          var curPath = path + "/" + file;
+          if(fs.lstatSync(curPath).isDirectory()) { // recurse
+            deleteFolderRecursive(curPath);
+          } else { // delete file
+            fs.unlinkSync(curPath);
+          }
+        });
+        fs.rmdirSync(path);
+      }
+    };
 
-  // Create a clean, empty directory
-  fs.mkdirSync('./download/');
+    deleteFolderRecursive('./download/');
 
-  console.log("Download directory emptied");
+    // Create a clean, empty directory
+    fs.mkdirSync('./download/');
 
-  // Let the client know that the request is complete
-  res.sendStatus(200);
+    console.log("Download directory emptied");
+
+    // Let the client know that the request is complete
+    res.sendStatus(200);
+  }
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
