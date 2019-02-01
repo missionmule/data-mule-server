@@ -46,14 +46,14 @@ class App extends Component {
       method: 'GET',
       responseType: 'blob', // important
     }).then((response) => {
-      console.log(response.data)
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('MissionMule', 'MissionMule.zip'); //or any other extension
-      document.body.appendChild(link);
-      link.click();
+       const url = window.URL.createObjectURL(new Blob([response.data]));
+       const link = document.createElement('a');
+       link.href = url;
+       link.setAttribute('download', 'MissionMule.zip'); //or any other extension
+       document.body.appendChild(link);
+       link.click();
     });
+
   }
 
   handleDeleteRequest = async (e: any) => {
