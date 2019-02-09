@@ -1,16 +1,19 @@
 {
-  "name": "example-create-react-app-express",
+  "name": "data-mule-server",
   "version": "1.0.0",
+  "license": "MIT",
   "scripts": {
     "client": "cd client && yarn start",
     "server": "nodemon server.js",
+    "setup": "npm install && cd client && npm install",
     "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
   },
   "dependencies": {
     "archiver": "^3.0.0",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "typescript": "^3.3.3"
   },
   "devDependencies": {
     "concurrently": "^4.0.1"

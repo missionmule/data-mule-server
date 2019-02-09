@@ -63,6 +63,9 @@ app.get('/api/delete', (req, res) => {
 
   console.log("Emptying download directory...");
 
+  // Avoid error thrown when checking directory that doesn't exist
+  if (!fs.existsSync('./download/')) fs.mkdirSync('./download/');
+
   var files = fs.readdirSync('./download/');
 
   // Custom HTTP response code for 'Nothing to delete'

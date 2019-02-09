@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-import logo from './logo.svg';
+import { Layout, Breadcrumb,  } from 'antd';
+
+import Nav from './Nav';
+
 import './App.css';
+
+const {
+  Header, Content, Footer,
+} = Layout;
 
 class App extends Component {
 
@@ -85,27 +92,46 @@ class App extends Component {
     this.setState({ deleteInProgress: false });
   };
 
+  // <form onSubmit={this.handleSubmit}>
+  //   <p>
+  //     <strong>Post to Server:</strong>
+  //   </p>
+  //   <input
+  //     type="text"
+  //     value={this.state.post}
+  //     onChange={e => this.setState({ post: e.target.value })}
+  //   />
+  //   <button type="submit">Submit</button>
+  // </form>
+  // <p>{this.state.responseToPost}</p>
+  // <form onSubmit={this.handleDownloadRequest}>
+  //   <button type="submit">Download</button>
+  // </form>
+  // <form onSubmit={this.handleDeleteRequest}>
+  //   <button type="submit">Delete</button>
+  // </form>
+
   render() {
     return (
       <div className="App">
-        <form onSubmit={this.handleSubmit}>
-          <p>
-            <strong>Post to Server:</strong>
-          </p>
-          <input
-            type="text"
-            value={this.state.post}
-            onChange={e => this.setState({ post: e.target.value })}
-          />
-          <button type="submit">Submit</button>
-        </form>
-        <p>{this.state.responseToPost}</p>
-        <form onSubmit={this.handleDownloadRequest}>
-          <button type="submit">Download</button>
-        </form>
-        <form onSubmit={this.handleDeleteRequest}>
-          <button type="submit">Delete</button>
-        </form>
+      <Layout style={{ minHeight: '100vh' }}>
+        <Nav />
+        <Layout>
+          <Header style={{ background: '#fff', padding: 0 }} />
+          <Content style={{ margin: '0 16px' }}>
+            <Breadcrumb style={{ margin: '16px 0' }}>
+              <Breadcrumb.Item>User</Breadcrumb.Item>
+              <Breadcrumb.Item>Bill</Breadcrumb.Item>
+            </Breadcrumb>
+            <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+              Bill is a cat.
+            </div>
+          </Content>
+          <Footer style={{ textAlign: 'center' }}>
+            Mission Mule © 2019
+          </Footer>
+        </Layout>
+      </Layout>
       </div>
     );
   }

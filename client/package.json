@@ -1,6 +1,7 @@
 {
-  "name": "data-mule-server",
+  "name": "data-mule-client",
   "version": "0.1.0",
+  "license": "MIT",
   "private": true,
   "proxy": "http://127.0.0.1:5000",
   "dependencies": {
@@ -8,6 +9,7 @@
     "@types/node": "10.12.19",
     "@types/react": "16.7.22",
     "@types/react-dom": "16.0.11",
+    "antd": "^3.13.2",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-scripts": "2.1.3",
