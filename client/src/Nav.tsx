@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { Layout, Menu, Icon, } from 'antd';
 
 import './Nav.css';
@@ -25,16 +26,16 @@ class Nav extends Component {
           <div className="logo" />
           <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
             <Menu.Item key="1">
-              <Icon type="pie-chart" />
-              <span>Flights</span>
+              <Link {...this.props} to="/flights">
+                <Icon type="pie-chart" />
+                <span>Flights</span>
+              </Link>
             </Menu.Item>
             <Menu.Item key="2">
-              <Icon type="desktop" />
-              <span>Data Stations</span>
-            </Menu.Item>
-            <Menu.Item key="3">
-              <Icon type="setting" />
-              <span>Config</span>
+              <Link {...this.props} to="/stations">
+                <Icon type="desktop" />
+                <span>Data Stations</span>
+              </Link>
             </Menu.Item>
           </Menu>
         </Sider>

@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import axios from 'axios';
 
 import { Layout, Breadcrumb,  } from 'antd';
 
+import Flights from './Flights';
+import Home from './Home';
 import Nav from './Nav';
+import Stations from './Stations';
 
 import './App.css';
 
@@ -114,24 +118,14 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-      <Layout style={{ minHeight: '100vh' }}>
-        <Nav />
-        <Layout>
-          <Header style={{ background: '#fff', padding: 0 }} />
-          <Content style={{ margin: '0 16px' }}>
-            <Breadcrumb style={{ margin: '16px 0' }}>
-              <Breadcrumb.Item>User</Breadcrumb.Item>
-              <Breadcrumb.Item>Bill</Breadcrumb.Item>
-            </Breadcrumb>
-            <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
-              Bill is a cat.
-            </div>
-          </Content>
-          <Footer style={{ textAlign: 'center' }}>
-            Mission Mule © 2019
-          </Footer>
+      <Router>
+        <Layout style={{ minHeight: '100vh' }}>
+          <Nav />
+          <Route exact path="/" component={Home} />
+          <Route path="/flights" component={Flights} />
+          <Route path="/stations"  component={Stations} />
         </Layout>
-      </Layout>
+      </Router>
       </div>
     );
   }
