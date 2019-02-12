@@ -118,14 +118,14 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-      <Router>
-        <Layout style={{ minHeight: '100vh' }}>
-          <Nav />
-          <Route exact path="/" component={Home} />
-          <Route path="/flights" component={Flights} />
-          <Route path="/stations"  component={Stations} />
-        </Layout>
-      </Router>
+        <Router>
+          <Layout style={{ minHeight: '100vh' }}>
+            <Nav />
+            <Route exact path="/" component={Home} />
+            <Route path="/flights" component={Flights} />
+            <Route path="/stations"  component={Stations} />
+          </Layout>
+        </Router>
       </div>
     );
   }

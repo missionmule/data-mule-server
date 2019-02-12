@@ -19,26 +19,26 @@ class Nav extends Component {
   render() {
     return (
       <Sider
-          collapsible
-          collapsed={this.state.collapsed}
-          onCollapse={this.onCollapse}
-        >
-          <div className="logo" />
-          <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-            <Menu.Item key="1">
-              <Link {...this.props} to="/flights">
-                <Icon type="pie-chart" />
-                <span>Flights</span>
-              </Link>
-            </Menu.Item>
-            <Menu.Item key="2">
-              <Link {...this.props} to="/stations">
-                <Icon type="desktop" />
-                <span>Data Stations</span>
-              </Link>
-            </Menu.Item>
-          </Menu>
-        </Sider>
+        collapsible
+        collapsed={this.state.collapsed}
+        onCollapse={this.onCollapse}
+      >
+        <div className="logo" />
+        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
+          <Menu.Item key="1">
+            <Link to="/flights">
+              <Icon type="pie-chart" />
+              <span>Flights</span>
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="2">
+            <Link to="/stations">
+              <Icon type="desktop" />
+              <span>Data Stations</span>
+            </Link>
+          </Menu.Item>
+        </Menu>
+      </Sider>
     );
   }
 
