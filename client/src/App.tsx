@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import axios from 'axios';
 
-import { Layout, Breadcrumb,  } from 'antd';
+import { Layout, Breadcrumb } from 'antd';
 
 import Flights from './Flights';
 import Home from './Home';
@@ -121,9 +121,19 @@ class App extends Component {
         <Router>
           <Layout style={{ minHeight: '100vh' }}>
             <Nav />
-            <Route exact path="/" component={Home} />
-            <Route path="/flights" component={Flights} />
-            <Route path="/stations"  component={Stations} />
+            <Layout>
+              <Header style={{ background: '#fff', padding: 0 }}>Header</Header>
+              <Content style={{ padding: '0 16px' }}>
+                <div style={{ margin: '16px 0', padding: 24, background: '#fff', minHeight: 360 }}>
+                  <Route exact path="/" component={Home} />
+                  <Route path="/flights" component={Flights} />
+                  <Route path="/stations"  component={Stations} />
+                </div>
+              </Content>
+              <Footer style={{ textAlign: 'center' }}>
+                Mission Mule ©2019
+              </Footer>
+            </Layout>
           </Layout>
         </Router>
       </div>

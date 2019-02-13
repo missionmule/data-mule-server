@@ -26,12 +26,18 @@ class Nav extends Component {
         <div className="logo" />
         <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
           <Menu.Item key="1">
+            <Link to="/">
+              <Icon type="pie-chart" />
+              <span>Home</span>
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="2">
             <Link to="/flights">
               <Icon type="pie-chart" />
               <span>Flights</span>
             </Link>
           </Menu.Item>
-          <Menu.Item key="2">
+          <Menu.Item key="3">
             <Link to="/stations">
               <Icon type="desktop" />
               <span>Data Stations</span>

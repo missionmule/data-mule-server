@@ -100,4 +100,21 @@ app.get('/api/delete', (req, res) => {
   }
 });
 
+app.post('/api/stations', (req, res) => {
+  stations = []
+
+  for (let i=0; i<req.body.results; i++) {
+    stations.push(
+      {
+        id: `12${i}`,
+        lastVisited: 1550007026,
+        redownload: true,
+        description: "blah blah blah",
+      }
+    );
+  };
+
+  res.send(stations);
+})
+
 app.listen(port, () => console.log(`Listening on port ${port}`));
