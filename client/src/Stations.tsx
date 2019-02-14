@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router-dom';
-import { Switch, Table } from 'antd';
+import { Icon, notification, Switch, Table } from 'antd';
 
 import './Stations.css';
 
@@ -36,7 +35,9 @@ class Stations extends Component<Props, State> {
     this.fetch();
   }
 
-  toggle = async (station: Station) => {
+  toggleRedownload = async (station: Station) => {
+
+    const oldRedownload = station.redownload;
 
     fetch('/api/stations/update', {
       method: 'POST',
@@ -52,7 +53,21 @@ class Stations extends Component<Props, State> {
     // Refetch station data
     // Yeah, it's not the most efficient, but it simplifies the system and
     // eliminates the risk of the state and database falling out of sync.
-    this.fetch();
+    await this.fetch();
+
+    // Give alert to the user to confirm
+    if (Boolean(oldRedownload) === false) {
+      notification['success']({
+        message: `Redownload Ordered`,
+        description: `A redownload for the data station with ID ${station.station_id} has been successfully scheduled for the next flight.`,
+      });
+    } else {
+      notification['error']({
+        message: `Redownload Canceled`,
+        description: `The scheduled redownload for data station with ID ${station.station_id} has been successfully canceled.`,
+      });
+    }
+
   }
 
   findStationStateIndex= (record: Station) => {
@@ -64,7 +79,7 @@ class Stations extends Component<Props, State> {
     { title: 'Last Visted', dataIndex: 'last_visited', key: 'last_visited' },
     { title: 'Redownload', dataIndex: 'redownload', key: 'redownload',
       render: (text: string, record: Station) => (
-        <span onClick={e => {e.preventDefault(); e.stopPropagation(); this.toggle(record);}}>
+        <span onClick={e => {e.preventDefault(); e.stopPropagation(); this.toggleRedownload(record);}}>
           <Switch checked={Boolean(this.state.data[this.findStationStateIndex(record)].redownload)}/>
         </span>
       ),
@@ -92,7 +107,6 @@ class Stations extends Component<Props, State> {
   }
 
   render() {
-
     return (
       <div>
         <Table
