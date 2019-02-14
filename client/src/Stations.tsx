@@ -1,35 +1,32 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
-import { Table } from 'antd';
+import { Switch, Table } from 'antd';
 
 import './Stations.css';
 
-interface IMatch {
+interface Match {
   url: string;
 }
 
-interface IProps {
-  match: IMatch;
+interface Props {
+  match: Match;
 }
 
-interface IState {}
+interface State {
+  data: any[],
+  pagination: object,
+  loading: boolean
+}
 
 interface Station {
-  id: string;
-  lastVisited: number;
+  station_id: string;
+  last_visited: number;
   redownload: boolean;
 }
 
-const columns = [
-  { title: 'ID', dataIndex: 'id', key: 'id' },
-  { title: 'Last Visted', dataIndex: 'lastVisited', key: 'lastVisited' },
-  { title: 'Redownload', dataIndex: 'redownload', key: 'redownload'},
-  { title: 'Delete', key: 'operation', render: () => <a href="javascript:;">Delete</a> },
-];
+class Stations extends Component<Props, State> {
 
-class Stations extends Component<IProps, IState> {
-
-  state = {
+  public state: State = {
     data: [],
     pagination: {},
     loading: false,
@@ -39,6 +36,41 @@ class Stations extends Component<IProps, IState> {
     this.fetch();
   }
 
+  toggle = async (station: Station) => {
+
+    fetch('/api/stations/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        station_id: station.station_id,
+        redownload: (station.redownload ? 0 : 1),
+      }),
+    })
+
+    // Refetch station data
+    // Yeah, it's not the most efficient, but it simplifies the system and
+    // eliminates the risk of the state and database falling out of sync.
+    this.fetch();
+  }
+
+  findStationStateIndex= (record: Station) => {
+    return this.state.data.findIndex((el: Station) => el.station_id === record.station_id);
+  }
+
+  columns = [
+    { title: 'ID', dataIndex: 'station_id', key: 'station_id' },
+    { title: 'Last Visted', dataIndex: 'last_visited', key: 'last_visited' },
+    { title: 'Redownload', dataIndex: 'redownload', key: 'redownload',
+      render: (text: string, record: Station) => (
+        <span onClick={e => {e.preventDefault(); e.stopPropagation(); this.toggle(record);}}>
+          <Switch checked={Boolean(this.state.data[this.findStationStateIndex(record)].redownload)}/>
+        </span>
+      ),
+    },
+  ];
+
   fetch = async () => {
     this.setState({ loading: true });
 
@@ -47,12 +79,10 @@ class Stations extends Component<IProps, IState> {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ results: 500 }),
+      body: JSON.stringify({}),
     })
 
     const body = JSON.parse(await response.text());
-
-    console.log(body);
 
     this.setState({
       loading: false,
@@ -66,9 +96,9 @@ class Stations extends Component<IProps, IState> {
     return (
       <div>
         <Table
-          columns={columns}
-          rowKey={(station: Station) => station.id}
-          dataSource={this.state.data }
+          columns={this.columns}
+          rowKey={(station: Station) => station.station_id}
+          dataSource={this.state.data}
           loading={this.state.loading}
           bordered
         />
@@ -77,12 +107,5 @@ class Stations extends Component<IProps, IState> {
   }
 
 }
-//
-// <Route path={`${this.props.match.url}/:stationId`} component={Station} />
-// <Route
-//   exact
-//   path={this.props.match.url}
-//   render={() => <h3>Please select a topic.</h3>}
-// />
 
 export default Stations;

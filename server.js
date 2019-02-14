@@ -2,9 +2,38 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const archiver = require('archiver');
+const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
 const port = process.env.PORT || 5000;
+
+
+process.on('SIGTERM', () => {
+  console.log("Shutting down...");
+  db.close();
+  console.log("Bye.");
+});
+
+process.on('exit', () => {
+  console.log("Shutting down...");
+  db.close();
+  console.log("Bye.");
+});
+//
+// process.on('uncaughtException', () => {
+//   console.log("Error. Shutting down...");
+//   db.close();
+//   console.log("Bye.");
+// });
+
+// Connect to avionics database
+let db = new sqlite3.Database('avionics.db', sqlite3.OPEN_READWRITE, (err) => {
+  if (err) {
+    console.error(err.message);
+  } else {
+    console.log('Connected to the avionics database.');
+  }
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -101,20 +130,59 @@ app.get('/api/delete', (req, res) => {
 });
 
 app.post('/api/stations', (req, res) => {
-  stations = []
+  let sql = `SELECT * FROM stations`;
 
-  for (let i=0; i<req.body.results; i++) {
-    stations.push(
-      {
-        id: `12${i}`,
-        lastVisited: 1550007026,
-        redownload: true,
-        description: "blah blah blah",
-      }
-    );
-  };
+  db.all(sql, [], (err, stations) => {
+    if (err) throw err;
 
-  res.send(stations);
+    res.send(stations);
+  });
+});
+
+async function getFlights() {
+  let sql = `SELECT * FROM flights ORDER BY timestamp DESC`;
+  return new Promise(function(resolve, reject) {
+    db.all(sql, [], (err, flights) => {
+      if (err) reject(err);
+      resolve(flights);
+    });
+  });
+}
+
+async function getStations(flight) {
+  let sql = `SELECT station_id, percent FROM flights_stations WHERE flight_id = ${flight.flight_id}`;
+  return new Promise(function(resolve, reject) {
+    db.all(sql, [], (err, stations) => {
+      if (err) reject(err);
+      resolve(stations);
+    });
+  });
+}
+
+app.post('/api/stations/update', (req, res) => {
+  const update = req.body;
+  let sql = `UPDATE stations SET redownload = ${update.redownload} WHERE station_id = ${update.station_id}`;
+  db.run(sql, [], function(err) {
+    if (err) console.log(err);
+    res.send("OK");
+  });
 })
+
+app.post('/api/flights', async (req, res) => {
+
+  let flightsStations = [];
+
+  try {
+    const flights = await getFlights();
+    for (let flight of flights) {
+      flight.stations = await getStations(flight);
+      flightsStations.push(flight);
+    }
+
+  } catch(err) {
+    console.log(err);
+  }
+  res.send(flightsStations);
+});
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
