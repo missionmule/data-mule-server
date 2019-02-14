@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
-import {Badge, Dropdown, Icon, Progress, Switch, Table } from 'antd';
+import {Badge, Button, Popconfirm, Progress, Table } from 'antd';
 
 import './Flights.css';
 
@@ -15,6 +15,7 @@ interface Props {
 interface State {
   data: any[];
   loading: boolean;
+  loadingDeleteAll: boolean;
 }
 
 interface Station {
@@ -23,44 +24,98 @@ interface Station {
 }
 
 interface Flight {
-  flight_id: string;
+  flight_id: number;
   timestamp: number;
   stations: Station[];
+  downloadInProgress: boolean;
+  deleteInProgress: boolean;
 }
 
+const ButtonGroup = Button.Group;
 
 class Flights extends Component<Props, State> {
 
   public state: State = {
     data: [],
     loading: false,
+    loadingDeleteAll: false,
   };
 
   componentDidMount() {
     this.fetch();
+
+    // Give each flight its own delete and download progress state
+    const data = this.state.data;
+    data.forEach((flight: Flight) => {
+      flight.deleteInProgress = false;
+      flight.downloadInProgress = false;
+    });
+    this.forceUpdate;
   }
 
-  onChange = async (checked: boolean) => {
-    console.log("here")
+  findFlightStateIndex= (record: Flight) => {
+    return this.state.data.findIndex((el: Flight) =>
+      el.flight_id === record.flight_id);
   }
 
-  // flightStatus = (text: any, record: Flight, index: Number) => {
-  //   for (let i = 0; i < 15; i++) {
-  //     if (record.stations[i].percent !== 100) {
-  //       return <Icon type="star" theme="filled" />
-  //     }
-  //   }
-  //   return <Icon type="check-circle" theme="filled" />
-  // }
+  onClickDownload = (record: Flight) => {
+    const index = this.findFlightStateIndex(record);
+
+    // tl;dr: Ugly, it gets the job done and I'd like to go home at some point :)
+    // Also, this only affects behavior if we use the shouldComponentUpdate()
+    // lifecycle method, which we aren't
+    this.state.data[index].downloadInProgress = true;
+    this.forceUpdate()
+
+    // Perform download
+
+    this.state.data[index].downloadInProgress = false;
+    this.forceUpdate()
+
+  }
+
+  onClickDelete = (record: Flight) => {
+    const index = this.findFlightStateIndex(record);
+
+    // tl;dr: Ugly, it gets the job done and I'd like to go home at some point :)
+    // Also, this only affects behavior if we use the shouldComponentUpdate()
+    // lifecycle method, which we aren't
+    this.state.data[index].deleteInProgress = true;
+    this.forceUpdate()
+
+    // Perform download
+    //
+    this.state.data[index].deleteInProgress = false;
+    this.forceUpdate()
+
+}
 
   columns = [
     { title: 'Date', dataIndex: 'timestamp', key: 'timestamp' },
     {
       title: 'Action',
       key: 'action',
-      render: () => (
+      render: (text: string, record: Flight) => (
        <span>
-         <a href="javascript:;">Delete</a>
+        <ButtonGroup>
+         <Button
+          type="primary"
+          shape="round"
+          icon="download"
+          size="small"
+          onClick={(e: any) => {e.preventDefault(); e.stopPropagation(); this.onClickDownload(record);}}
+          loading={this.state.data[this.findFlightStateIndex(record)].downloadInProgress}>
+            Download
+          </Button>
+          <Popconfirm title="Are you sure you want to delete all flight data?" onConfirm={(e: any) => {e.preventDefault(); e.stopPropagation(); this.onClickDelete(record);}} okText="Yes" cancelText="No">
+            <Button
+             type="danger"
+             shape="round"
+             icon="delete"
+             size="small"
+             loading={this.state.data[this.findFlightStateIndex(record)].deleteInProgress}/>
+          </Popconfirm>
+        </ButtonGroup>
        </span>
       ),
     },
@@ -96,7 +151,7 @@ class Flights extends Component<Props, State> {
 
   expandedRowRender = (record: Flight) => {
     const columns = [
-      { title: 'Station ID', dataIndex: 'station_id', key: 'station_id' },
+      { title: 'Data Station ID', width: '20%', dataIndex: 'station_id', key: 'station_id' },
       { title: 'Percent Downloaded', dataIndex: 'percent', key: 'percent', render: (text: string, record: Station) => (
         <span><Progress percent={record.percent} /></span>
       )},
@@ -115,13 +170,20 @@ class Flights extends Component<Props, State> {
     );
   };
 
+  deleteAll = () => {
+    console.log("Delete all flights");
+    this.setState({loadingDeleteAll: true});
+
+    this.setState({loadingDeleteAll: false});
+  }
+
   render() {
 
     return (
       <div>
         <Table
           columns={this.columns}
-          rowKey={(flight: Flight) => flight.flight_id}
+          rowKey={(flight: Flight) => flight.flight_id.toString()}
           dataSource={this.state.data }
           loading={this.state.loading}
           expandedRowRender={(record: Flight) => (this.expandedRowRender(record))}
