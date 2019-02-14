@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
-import {Icon, Switch, Table } from 'antd';
+import {Badge, Dropdown, Icon, Progress, Switch, Table } from 'antd';
 
 import './Flights.css';
 
@@ -12,24 +12,26 @@ interface Props {
   match: Match;
 }
 
-interface State {}
+interface State {
+  data: any[];
+  loading: boolean;
+}
 
 interface Station {
   station_id: string;
   percent: number;
 }
+
 interface Flight {
   flight_id: string;
   timestamp: number;
-  stations: {
-    [key: string]: Station
-  };
+  stations: Station[];
 }
 
 
 class Flights extends Component<Props, State> {
 
-  state = {
+  public state: State = {
     data: [],
     loading: false,
   };
@@ -80,8 +82,38 @@ class Flights extends Component<Props, State> {
       loading: false,
       data: body,
     });
-
   }
+
+  statusBadge = (station: Station) => {
+    if (station.percent <= 0) {
+      return <span><Badge status="error" />Failure</span>
+    } else if (station.percent < 100) {
+      return <span><Badge status="warning" />Incomplete</span>
+    } else {
+      return <span><Badge status="success" />Complete</span>
+    }
+  }
+
+  expandedRowRender = (record: Flight) => {
+    const columns = [
+      { title: 'Station ID', dataIndex: 'station_id', key: 'station_id' },
+      { title: 'Percent Downloaded', dataIndex: 'percent', key: 'percent', render: (text: string, record: Station) => (
+        <span><Progress percent={record.percent} /></span>
+      )},
+      { title: 'Status', rowKey: 'status', render: (text: string, record: Station) => (this.statusBadge(record)) },
+    ];
+
+    const data: Station[] = record.stations;
+
+    return (
+      <Table
+        rowKey={(record) => record.station_id}
+        columns={columns}
+        dataSource={data}
+        pagination={false}
+      />
+    );
+  };
 
   render() {
 
@@ -92,6 +124,7 @@ class Flights extends Component<Props, State> {
           rowKey={(flight: Flight) => flight.flight_id}
           dataSource={this.state.data }
           loading={this.state.loading}
+          expandedRowRender={(record: Flight) => (this.expandedRowRender(record))}
           bordered
         />
       </div>

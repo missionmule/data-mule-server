@@ -12,9 +12,9 @@ interface Props {
 }
 
 interface State {
-  data: any[],
-  pagination: object,
-  loading: boolean
+  data: any[];
+  pagination: object;
+  loading: boolean;
 }
 
 interface Station {
@@ -71,7 +71,8 @@ class Stations extends Component<Props, State> {
   }
 
   findStationStateIndex= (record: Station) => {
-    return this.state.data.findIndex((el: Station) => el.station_id === record.station_id);
+    return this.state.data.findIndex((el: Station) =>
+      el.station_id === record.station_id);
   }
 
   columns = [
