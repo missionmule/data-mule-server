@@ -1,1 +1,37 @@
 
+.pageHeader {
+  padding: 16px 32px 0 32px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.title {
+  font-weight: 500;
+  font-size: 20px;
+}
+
+.title,
+.content {
+  flex: auto;
+}
+
+.main {
+  width: 100%;
+}
+
+.title,
+.action {
+  margin-bottom: 16px;
+}
+
+
+@media screen and (max-width: @screen-md) {
+  .pageHeader.row {
+    display: block;
+  }
+}

@@ -221,6 +221,9 @@ class Flights extends Component<Props, State> {
 
     return (
       <div>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flexStart', width: '100%'}}>
+          <h1 style={{ fontWeight: 600, fontSize: '20px'}}>Flights</h1>
+        </div>
         <Table
           columns={this.columns}
           rowKey={(flight: Flight) => flight.flight_id.toString()}

@@ -110,6 +110,9 @@ class Stations extends Component<Props, State> {
   render() {
     return (
       <div>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flexStart', width: '100%'}}>
+          <h1 style={{ fontWeight: 600, fontSize: '20px'}}>Data Stations</h1>
+        </div>
         <Table
           columns={this.columns}
           rowKey={(station: Station) => station.station_id}
