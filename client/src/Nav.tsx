@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout, Menu, Icon, } from 'antd';
+import {ReactComponent as Airplane} from './img/airplane.svg';
+import {ReactComponent as PhotoCamera} from './img/photo-camera.svg';
 
 import './Nav.css';
 
@@ -17,6 +19,7 @@ class Nav extends Component {
   }
 
   render() {
+
     return (
       <Sider
         collapsible
@@ -24,22 +27,20 @@ class Nav extends Component {
         onCollapse={this.onCollapse}
       >
         <div className="logo" />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-          <Menu.Item key="1">
-            <Link to="/">
-              <Icon type="pie-chart" />
-              <span>Home</span>
-            </Link>
-          </Menu.Item>
+        <Menu theme="dark" defaultSelectedKeys={['2']} mode="inline">
           <Menu.Item key="2">
             <Link to="/flights">
-              <Icon type="pie-chart" />
+            {/*
+              // @ts-ignore */}
+              <Icon component={Airplane}/>
               <span>Flights</span>
             </Link>
           </Menu.Item>
           <Menu.Item key="3">
             <Link to="/stations">
-              <Icon type="desktop" />
+            {/*
+              // @ts-ignore */}
+              <Icon component={PhotoCamera}/>
               <span>Data Stations</span>
             </Link>
           </Menu.Item>
@@ -49,5 +50,13 @@ class Nav extends Component {
   }
 
 }
+
+// TODO: Add home page with overview of flight stats, file system usage, data stations, etc.
+// <Menu.Item key="1">
+//   <Link to="/">
+//     <Icon type="pie-chart" />
+//     <span>Home</span>
+//   </Link>
+// </Menu.Item>
 
 export default Nav;
