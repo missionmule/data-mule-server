@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, notification, Switch, Table } from 'antd';
+import { notification, Switch, Table } from 'antd';
 
 import './Stations.css';
 

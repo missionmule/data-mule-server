@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
-import {Badge, Button, Popconfirm, Progress, Table } from 'antd';
+import {Badge, Button, notification, Popconfirm, Progress, Table } from 'antd';
+import axios from 'axios';
 
 import './Flights.css';
 
@@ -42,7 +43,7 @@ class Flights extends Component<Props, State> {
   };
 
   componentDidMount() {
-    this.fetch();
+    this.fetchFlights();
 
     // Give each flight its own delete and download progress state
     const data = this.state.data;
@@ -58,7 +59,7 @@ class Flights extends Component<Props, State> {
       el.flight_id === record.flight_id);
   }
 
-  onClickDownload = (record: Flight) => {
+  onClickDownload = async (record: Flight) => {
     const index = this.findFlightStateIndex(record);
 
     // tl;dr: Ugly, it gets the job done and I'd like to go home at some point :)
@@ -67,14 +68,40 @@ class Flights extends Component<Props, State> {
     this.state.data[index].downloadInProgress = true;
     this.forceUpdate()
 
-    // Perform download
+    await axios({
+      url: '/api/flights/download',
+      method: 'POST',
+      data: JSON.stringify({
+        flight_id: record.flight_id,
+      }),
+      headers: {
+            'Content-Type': 'application/json',
+      },
+      responseType: 'blob',
+    }).then((response) => {
+      if (response.status  === 204) { // Standard code: HTTP/1.1 10.2.5 204 No Content
+        notification.info({
+          message: 'Nothing to Download',
+          description: 'There is no data to be downloaded from this flight. This is likely due to a failed download during flight.',
+        });
+      } else {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${record.timestamp}.zip`);
+        document.body.appendChild(link);
+        link.click();
+      }
+    }).catch((err) => {
+      console.log(err)
+    });
 
     this.state.data[index].downloadInProgress = false;
     this.forceUpdate()
 
   }
 
-  onClickDelete = (record: Flight) => {
+  onClickDelete = async (record: Flight) => {
     const index = this.findFlightStateIndex(record);
 
     // tl;dr: Ugly, it gets the job done and I'd like to go home at some point :)
@@ -83,11 +110,24 @@ class Flights extends Component<Props, State> {
     this.state.data[index].deleteInProgress = true;
     this.forceUpdate()
 
-    // Perform download
-    //
-    this.state.data[index].deleteInProgress = false;
-    this.forceUpdate()
+    // Perform delete
+    await fetch('/api/flights/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        flight_id: record.flight_id,
+      }),
+    })
 
+    // This is a little redundant, but it makes things a little more intelligible
+    this.state.data[index].deleteInProgress = false;
+    this.forceUpdate();
+
+    this.setState({data: this.state.data.filter(function(flight) {
+        return flight.flight_id !== record.flight_id;
+    })});
 }
 
   columns = [
@@ -121,7 +161,7 @@ class Flights extends Component<Props, State> {
     },
   ];
 
-  fetch = async () => {
+  fetchFlights = async () => {
     this.setState({ loading: true });
 
     const response = await fetch('/api/flights', {

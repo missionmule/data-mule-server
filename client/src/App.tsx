@@ -96,24 +96,6 @@ class App extends Component {
     this.setState({ deleteInProgress: false });
   };
 
-  // <form onSubmit={this.handleSubmit}>
-  //   <p>
-  //     <strong>Post to Server:</strong>
-  //   </p>
-  //   <input
-  //     type="text"
-  //     value={this.state.post}
-  //     onChange={e => this.setState({ post: e.target.value })}
-  //   />
-  //   <button type="submit">Submit</button>
-  // </form>
-  // <p>{this.state.responseToPost}</p>
-  // <form onSubmit={this.handleDownloadRequest}>
-  //   <button type="submit">Download</button>
-  // </form>
-  // <form onSubmit={this.handleDeleteRequest}>
-  //   <button type="submit">Delete</button>
-  // </form>
 
   render() {
     return (
@@ -131,7 +113,7 @@ class App extends Component {
                 </div>
               </Content>
               <Footer style={{ textAlign: 'center' }}>
-                Mission Mule ©2019
+                Mission Mule © 2019
               </Footer>
             </Layout>
           </Layout>

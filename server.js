@@ -19,12 +19,6 @@ process.on('exit', () => {
   db.close();
   console.log("Bye.");
 });
-//
-// process.on('uncaughtException', () => {
-//   console.log("Error. Shutting down...");
-//   db.close();
-//   console.log("Bye.");
-// });
 
 // Connect to avionics database
 let db = new sqlite3.Database('avionics.db', sqlite3.OPEN_READWRITE, (err) => {
@@ -184,5 +178,92 @@ app.post('/api/flights', async (req, res) => {
   }
   res.send(flightsStations);
 });
+
+// Delete flight row from database and downloaded data on disk
+app.post('/api/flights/delete', (req, res) => {
+
+  // First, clear flight from database
+  const flight = req.body;
+
+  let sql = `DELETE FROM flights WHERE flight_id = ${flight.flight_id}`;
+  db.run(sql, [], function(err) {
+    if (err) console.log(err);
+  });
+
+  // Next, delete data from the flight
+  const deletePath = `./download/${flight.flight_id}`;
+
+  // Avoid error thrown when checking directory that doesn't exist
+  if (!fs.existsSync(deletePath)) fs.mkdirSync(deletePath);
+
+  var files = fs.readdirSync(deletePath);
+
+  if (files.length !== 0) {
+    var deleteFolderRecursive = function(path) {
+      if( fs.existsSync(path) ) {
+        fs.readdirSync(path).forEach(function(file,index){
+          var curPath = path + "/" + file;
+          if(fs.lstatSync(curPath).isDirectory()) { // recurse
+            deleteFolderRecursive(curPath);
+          } else { // delete file
+            fs.unlinkSync(curPath);
+          }
+        });
+        fs.rmdirSync(path);
+      }
+    };
+
+    deleteFolderRecursive(deletePath);
+
+  }
+
+  // Accounts for edge case of deletion of an empty directory from failed in-flight download
+  if (fs.existsSync(deletePath)) fs.rmdirSync(deletePath);
+
+  // Let the client know that the request is complete
+  res.sendStatus(200);
+
+});
+
+app.post('/api/flights/download', (req, res) => {
+
+  const flight = req.body;
+  const downloadPath = `./download/${flight.flight_id}`;
+
+  // Avoid error thrown when checking directory that doesn't exist
+  if (!fs.existsSync(downloadPath)) fs.mkdirSync(downloadPath);
+
+  if (fs.readdirSync(downloadPath).length === 0) {
+    res.sendStatus(204); // Standard code: HTTP/1.1 10.2.5 204 No Content
+  } else {
+    var output = fs.createWriteStream('data.zip');
+    var archive = archiver('zip');
+
+    output.on('close', function () {
+
+      const src = fs.createReadStream('./data.zip');
+      // Pipe read stream to client
+      src.pipe(res);
+
+      src.on('error', function(err) {
+        throw(err);
+      });
+
+      // Once the piped download is complete, delete the generated zip
+      src.on('close', () => {
+        fs.unlinkSync('./data.zip');
+      });
+
+    });
+
+    archive.on('error', function(err){
+      throw err;
+    });
+
+    archive.pipe(output);
+    archive.directory(`./download/${flight.flight_id}`);
+    archive.finalize();
+  };
+})
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
