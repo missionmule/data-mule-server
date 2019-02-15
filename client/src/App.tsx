@@ -104,7 +104,7 @@ class App extends Component {
           <Layout style={{ minHeight: '100vh' }}>
             <Nav />
             <Layout>
-              <Header style={{ background: '#fff', padding: 0 }}>Header</Header>
+              <Header style={{ background: '#fff', padding: 0 }} />
               <Content style={{ padding: '0 16px' }}>
                 <div style={{ margin: '16px 0', padding: 24, background: '#fff', minHeight: 360 }}>
                   <Route exact path="/" component={Home} />

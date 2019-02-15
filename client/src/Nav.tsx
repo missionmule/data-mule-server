@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Layout, Menu, Icon, } from 'antd';
 import {ReactComponent as Airplane} from './img/airplane.svg';
 import {ReactComponent as PhotoCamera} from './img/photo-camera.svg';
+import logo from './img/mm.png';
 
 import './Nav.css';
 
@@ -26,7 +27,12 @@ class Nav extends Component {
         collapsed={this.state.collapsed}
         onCollapse={this.onCollapse}
       >
-        <div className="logo" />
+        <div style={{posiion: 'relative', height: '32px', margin: '16px', display:'flex', flex: '1'}}>
+          <span style={{width: '100%'}}>
+            <img style={{height: '100%'}} src={logo} alt="Logo" />;
+            {!this.state.collapsed ? <h1 style={{ color: '#fff', fontWeight: 600, fontSize: '18px', display: 'inline-block', verticalAlign: 'top', padding: '3px 8px 8px 8px'}}>Mission Mule</h1> : null }
+          </span>
+        </div>
         <Menu theme="dark" defaultSelectedKeys={['2']} mode="inline">
           <Menu.Item key="2">
             <Link to="/flights">
