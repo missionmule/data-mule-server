@@ -1,0 +1,24 @@
+{
+  "name": "data-mule-server",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "client": "cd client && yarn start",
+    "client-prod": "cd client && yarn build && serve -s build/ -l 3000",
+    "server": "nodemon server.js",
+    "setup": "sudo npm install -g nodemon && yarn install && cd client && yarn install",
+    "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\"",
+    "prod": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client-prod\"",
+  },
+  "dependencies": {
+    "archiver": "^3.0.0",
+    "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "sqlite3": "^4.0.6",
+    "typescript": "^3.3.3"
+  },
+  "devDependencies": {
+    "concurrently": "^4.0.1"
+  }
+}
