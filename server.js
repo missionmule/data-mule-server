@@ -144,7 +144,7 @@ async function getFlights() {
 }
 
 async function getStations(flight) {
-  let sql = `SELECT station_id, percent FROM flights_stations WHERE flight_id = ${flight.flight_id}`;
+  let sql = `SELECT station_id, successful_downloads, total_files FROM flights_stations WHERE flight_id = ${flight.flight_id}`;
   return new Promise(function(resolve, reject) {
     db.all(sql, [], (err, stations) => {
       if (err) reject(err);

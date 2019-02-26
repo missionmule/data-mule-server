@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router-dom';
 import {Badge, Button, notification, Popconfirm, Progress, Table } from 'antd';
 import axios from 'axios';
 
@@ -21,7 +20,8 @@ interface State {
 
 interface Station {
   station_id: string;
-  percent: number;
+  successful_downloads: number;
+  total_files: number;
 }
 
 interface Flight {
@@ -82,7 +82,7 @@ class Flights extends Component<Props, State> {
       if (response.status  === 204) { // Standard code: HTTP/1.1 10.2.5 204 No Content
         notification.info({
           message: 'Nothing to Download',
-          description: 'There is no data to be downloaded from this flight. This is likely due to a failed download during flight.',
+          description: 'There is no data to be downloaded from this flight. This is likely due to a no data station visits during this flight or a failed download.',
         });
       } else {
         const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -104,7 +104,7 @@ class Flights extends Component<Props, State> {
   onClickDelete = async (record: Flight) => {
     const index = this.findFlightStateIndex(record);
 
-    // tl;dr: Ugly, it gets the job done and I'd like to go home at some point :)
+    // tl;dr: Ugly, but it gets the job done and I'd like to go home at some point :)
     // Also, this only affects behavior if we use the shouldComponentUpdate()
     // lifecycle method, which we aren't
     this.state.data[index].deleteInProgress = true;
@@ -147,7 +147,7 @@ class Flights extends Component<Props, State> {
           loading={this.state.data[this.findFlightStateIndex(record)].downloadInProgress}>
             Download
           </Button>
-          <Popconfirm title="Are you sure you want to delete all flight data?" onConfirm={(e: any) => {e.preventDefault(); e.stopPropagation(); this.onClickDelete(record);}} okText="Yes" cancelText="No">
+          <Popconfirm title="Are you sure you want to delete this flight including all data downloaded?" onConfirm={(e: any) => {e.preventDefault(); e.stopPropagation(); this.onClickDelete(record);}} okText="Yes" cancelText="No">
             <Button
              type="danger"
              shape="round"
@@ -180,9 +180,10 @@ class Flights extends Component<Props, State> {
   }
 
   statusBadge = (station: Station) => {
-    if (station.percent <= 0) {
+    const percent = station.successful_downloads/station.total_files*100;
+    if (percent <= 0) {
       return <span><Badge status="error" />Failure</span>
-    } else if (station.percent < 100) {
+    } else if (percent < 100) {
       return <span><Badge status="warning" />Incomplete</span>
     } else {
       return <span><Badge status="success" />Complete</span>
@@ -193,8 +194,10 @@ class Flights extends Component<Props, State> {
     const columns = [
       { title: 'Data Station ID', width: '20%', dataIndex: 'station_id', key: 'station_id' },
       { title: 'Percent Downloaded', dataIndex: 'percent', key: 'percent', render: (text: string, record: Station) => (
-        <span><Progress percent={record.percent} /></span>
+        <span><Progress percent={record.successful_downloads/record.total_files*100} /></span>
       )},
+      { title: 'Downloaded Files', width: '15%', dataIndex: 'successful_downloads', key: 'successful_downloads'},
+      { title: 'Total Files', width: '15%',dataIndex: 'total_files', key: 'total_files'},
       { title: 'Status', rowKey: 'status', render: (text: string, record: Station) => (this.statusBadge(record)) },
     ];
 
