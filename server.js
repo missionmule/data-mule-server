@@ -79,7 +79,7 @@ app.get('/api/download', (req, res) => {
   });
 
   archive.pipe(output);
-  archive.directory('./download/');
+  archive.directory('/srv/');
   archive.finalize();
 
 });
@@ -89,9 +89,9 @@ app.get('/api/delete', (req, res) => {
   console.log("Emptying download directory...");
 
   // Avoid error thrown when checking directory that doesn't exist
-  if (!fs.existsSync('./download/')) fs.mkdirSync('./download/');
+  if (!fs.existsSync('/srv/')) fs.mkdirSync('/srv/');
 
-  var files = fs.readdirSync('./download/');
+  var files = fs.readdirSync('/srv/');
 
   // Custom HTTP response code for 'Nothing to delete'
   if (files.length == 0) {
@@ -113,10 +113,10 @@ app.get('/api/delete', (req, res) => {
       }
     };
 
-    deleteFolderRecursive('./download/');
+    deleteFolderRecursive('/srv/');
 
     // Create a clean, empty directory
-    fs.mkdirSync('./download/');
+    fs.mkdirSync('/srv/');
 
     console.log("Download directory emptied");
 
@@ -193,7 +193,7 @@ app.post('/api/flights/delete', (req, res) => {
   });
 
   // Next, delete data from the flight
-  const deletePath = `./download/${flight.flight_id}`;
+  const deletePath = `/srv/${flight.flight_id}`;
 
   // Avoid error thrown when checking directory that doesn't exist
   if (!fs.existsSync(deletePath)) fs.mkdirSync(deletePath);
@@ -230,7 +230,7 @@ app.post('/api/flights/delete', (req, res) => {
 app.post('/api/flights/download', (req, res) => {
 
   const flight = req.body;
-  const downloadPath = `./download/${flight.flight_id}`;
+  const downloadPath = `/srv/${flight.flight_id}`;
 
   // Avoid error thrown when checking directory that doesn't exist
   if (!fs.existsSync(downloadPath)) fs.mkdirSync(downloadPath);
@@ -263,7 +263,7 @@ app.post('/api/flights/download', (req, res) => {
     });
 
     archive.pipe(output);
-    archive.directory(`./download/${flight.flight_id}`);
+    archive.directory(`/srv/${flight.flight_id}`);
     archive.finalize();
   };
 })
