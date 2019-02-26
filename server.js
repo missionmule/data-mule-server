@@ -20,8 +20,10 @@ process.on('exit', () => {
   console.log("Bye.");
 });
 
+const db_path = '/var/lib/avionics.db';
+
 // Connect to avionics database
-let db = new sqlite3.Database('avionics.db', sqlite3.OPEN_READWRITE, (err) => {
+let db = new sqlite3.Database(db_path, sqlite3.OPEN_READWRITE, (err) => {
   if (err) {
     console.error(err.message);
   } else {

@@ -147,7 +147,7 @@ class Flights extends Component<Props, State> {
           loading={this.state.data[this.findFlightStateIndex(record)].downloadInProgress}>
             Download
           </Button>
-          <Popconfirm title="Are you sure you want to delete this flight including all data downloaded?" onConfirm={(e: any) => {e.preventDefault(); e.stopPropagation(); this.onClickDelete(record);}} okText="Yes" cancelText="No">
+          <Popconfirm title="Are you sure you want to delete this flight record including all data downloaded?" onConfirm={(e: any) => {e.preventDefault(); e.stopPropagation(); this.onClickDelete(record);}} okText="Yes" cancelText="No">
             <Button
              type="danger"
              shape="round"
