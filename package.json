@@ -5,7 +5,7 @@
   "scripts": {
     "client": "cd client && yarn start",
     "server": "nodemon server.js",
-    "setup": "yarn global add nodemon && dyarn install && cd client && yarn install",
+    "setup": "yarn global add nodemon && npm install --build-from-source --sqlite=/usr && yarn install && cd client && yarn install",
     "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
   },
   "dependencies": {
@@ -13,7 +13,6 @@
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
-    "sqlite3": "^4.0.6",
     "typescript": "^3.3.3"
   },
   "devDependencies": {
