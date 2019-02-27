@@ -194,7 +194,7 @@ class Flights extends Component<Props, State> {
     const columns = [
       { title: 'Data Station ID', width: '20%', dataIndex: 'station_id', key: 'station_id' },
       { title: 'Percent Downloaded', dataIndex: 'percent', key: 'percent', render: (text: string, record: Station) => (
-        <span><Progress percent={record.successful_downloads/record.total_files*100} /></span>
+        <span><Progress percent={record.total_files == 0 ? 100 : record.successful_downloads/record.total_files*100} /></span>
       )},
       { title: 'Downloaded Files', width: '15%', dataIndex: 'successful_downloads', key: 'successful_downloads'},
       { title: 'Total Files', width: '15%',dataIndex: 'total_files', key: 'total_files'},
