@@ -181,7 +181,14 @@ app.post('/api/flights/delete', (req, res) => {
   // First, clear flight from database
   const flight = req.body;
 
+  // Delete the main flight record
   let sql = `DELETE FROM flights WHERE flight_id = ${flight.flight_id}`;
+  db.run(sql, [], function(err) {
+    if (err) console.log(err);
+  });
+
+  // Clear out records from flights_stations as well
+  let sql = `DELETE FROM flights_stations WHERE flight_id = ${flight.flight_id}`;
   db.run(sql, [], function(err) {
     if (err) console.log(err);
   });
