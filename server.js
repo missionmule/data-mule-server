@@ -8,28 +8,22 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 
-process.on('SIGTERM', () => {
-  console.log("Shutting down...");
-  db.close();
-  console.log("Bye.");
-});
-
-process.on('exit', () => {
-  console.log("Shutting down...");
-  db.close();
-  console.log("Bye.");
-});
-
 const db_path = '/var/lib/avionics.db';
 
 // Connect to avionics database
-let db = new sqlite3.Database(db_path, sqlite3.OPEN_READWRITE, (err) => {
+let db = new sqlite3.Database(db_path, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
   if (err) {
     console.error(err.message);
   } else {
     console.log('Connected to the avionics database.');
   }
 });
+
+db.run('CREATE TABLE IF NOT EXISTS flights(flight_id INTEGER PRIMARY KEY AUTOINCREMENT, timestamp DATETIME)');
+
+db.run('CREATE TABLE IF NOT EXISTS stations(station_id INTEGER PRIMARY KEY, last_visited DATETIME, redownload INTEGER)');
+
+db.run('CREATE TABLE IF NOT EXISTS flights_stations(flight_id INTEGER, station_id INTEGER, successful_downloads INTEGER, total_files INTEGER)');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -268,4 +262,8 @@ app.post('/api/flights/download', (req, res) => {
   };
 })
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+const server = app.listen(port, () => console.log(`Listening on port ${port}`));
+
+// Gracefully shutdown
+process.on('SIGTERM', () => { server.close() });
+process.on('SIGINT', () => { server.close() });
