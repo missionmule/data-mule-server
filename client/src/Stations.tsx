@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { notification, Switch, Table } from 'antd';
+import fetch from 'node-fetch';
 
 import './Stations.css';
 
@@ -32,7 +33,7 @@ class Stations extends Component<Props, State> {
   };
 
   componentDidMount() {
-    this.fetch();
+    this.fetchAll();
   }
 
   toggleRedownload = async (station: Station) => {
@@ -53,7 +54,7 @@ class Stations extends Component<Props, State> {
     // Refetch station data
     // Yeah, it's not the most efficient, but it simplifies the system and
     // eliminates the risk of the state and database falling out of sync.
-    await this.fetch();
+    await this.fetchAll();
 
     // Give alert to the user to confirm
     if (Boolean(oldRedownload) === false) {
@@ -87,7 +88,7 @@ class Stations extends Component<Props, State> {
     },
   ];
 
-  fetch = async () => {
+  fetchAll = async () => {
     this.setState({ loading: true });
 
     const response = await fetch('/api/stations', {

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {Badge, Button, notification, Popconfirm, Progress, Table } from 'antd';
 import axios from 'axios';
+import fetch from 'node-fetch';
 
 import './Flights.css';
 
