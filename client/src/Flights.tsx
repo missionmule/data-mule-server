@@ -69,7 +69,7 @@ class Flights extends Component<Props, State> {
     this.forceUpdate()
 
     await axios({
-      url: '/api/flights/download',
+      url: 'http:192.168.4.1:5000/api/flights/download',
       method: 'POST',
       data: JSON.stringify({
         flight_id: record.flight_id,
@@ -167,6 +167,7 @@ class Flights extends Component<Props, State> {
 
     const response = await fetch('http://192.168.4.1:5000/api/flights', {
       method: 'POST',
+      mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

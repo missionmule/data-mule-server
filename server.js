@@ -27,12 +27,6 @@ db.run('CREATE TABLE IF NOT EXISTS flights_stations(flight_id INTEGER, station_i
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.all('/', (req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  next();
- });
-
 app.get('/api/hello', (req, res) => {
   res.send({ express: 'Hello From Express' });
 });
