@@ -7,7 +7,6 @@ const sqlite3 = require('sqlite3').verbose();
 const app = express();
 const port = process.env.PORT || 5000;
 
-
 const db_path = '/var/lib/avionics.db';
 
 // Connect to avionics database
@@ -37,6 +36,42 @@ app.post('/api/world', (req, res) => {
   res.send(
     `I received your POST request. This is what you sent me: ${req.body.post}`,
   );
+});
+
+app.get('/api/logs', (req, res) => {
+
+  var output = fs.createWriteStream('data.zip');
+  var archive = archiver('zip');
+
+  output.on('close', function () {
+    console.log("Zipping complete");
+
+    const src = fs.createReadStream('./data.zip');
+
+    console.log("Beginning download...");
+
+    // Pipe read stream to client
+    src.pipe(res);
+
+    src.on('error', function(err) {
+      throw(err);
+    });
+
+    // Once the piped download is complete, delete the generated zip
+    src.on('close', () => {
+      console.log("Download complete");
+      fs.unlinkSync('./data.zip');
+    });
+
+  });
+
+  archive.on('error', function(err){
+    throw err;
+  });
+
+  archive.pipe(output);
+  archive.file('/var/log/mission-mule-flight.log');
+  archive.finalize();
 });
 
 app.get('/api/download', (req, res) => {
@@ -188,7 +223,7 @@ app.post('/api/flights/delete', (req, res) => {
   });
 
   // Clear out records from flights_stations as well
-  let sql = `DELETE FROM flights_stations WHERE flight_id = ${flight.flight_id}`;
+  sql = `DELETE FROM flights_stations WHERE flight_id = ${flight.flight_id}`;
   db.run(sql, [], function(err) {
     if (err) console.log(err);
   });
