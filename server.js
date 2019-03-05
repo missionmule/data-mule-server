@@ -38,6 +38,7 @@ app.post('/api/world', (req, res) => {
   );
 });
 
+// Allows for open CORS policy when making local requests
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
