@@ -115,6 +115,7 @@ class Flights extends Component<Props, State> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
       body: JSON.stringify({
         flight_id: record.flight_id,
@@ -168,6 +169,7 @@ class Flights extends Component<Props, State> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
     })
 
