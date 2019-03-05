@@ -40,7 +40,7 @@ class Stations extends Component<Props, State> {
 
     const oldRedownload = station.redownload;
 
-    fetch('http://localhost:5000/api/stations/update', {
+    fetch('http://192.168.4.1:5000/api/stations/update', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -91,7 +91,7 @@ class Stations extends Component<Props, State> {
   fetchAll = async () => {
     this.setState({ loading: true });
 
-    const response = await fetch('http://localhost:5000/api/stations', {
+    const response = await fetch('http://192.168.4.1:5000/api/stations', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

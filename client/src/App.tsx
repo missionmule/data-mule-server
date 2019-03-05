@@ -33,7 +33,7 @@ class App extends Component {
 
   // Verifies that the API is up and running
   callApi = async () => {
-    const response = await fetch('http://localhost:5000/api/hello');
+    const response = await fetch('http://192.168.4.1:5000/api/hello');
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
     return body;
@@ -41,7 +41,7 @@ class App extends Component {
 
   handleSubmit = async (e: any) => {
     e.preventDefault();
-    const response = await fetch('http://localhost:5000/api/world', {
+    const response = await fetch('http://192.168.4.1:5000/api/world', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ class App extends Component {
 
     this.setState({ deleteInProgress: true });
 
-    const response = await fetch('http://localhost:5000/api/delete');
+    const response = await fetch('http://192.168.4.1:5000/api/delete');
     const body = await response;
 
     // Custom HTTP response code for 'Nothing to delete'

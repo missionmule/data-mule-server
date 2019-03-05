@@ -111,7 +111,7 @@ class Flights extends Component<Props, State> {
     this.forceUpdate()
 
     // Perform delete
-    await fetch('http://localhost:5000/api/flights/delete', {
+    await fetch('http://192.168.4.1:5000/api/flights/delete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -165,7 +165,7 @@ class Flights extends Component<Props, State> {
   fetchFlights = async () => {
     this.setState({ loading: true });
 
-    const response = await fetch('http://localhost:5000/api/flights', {
+    const response = await fetch('http://192.168.4.1:5000/api/flights', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
