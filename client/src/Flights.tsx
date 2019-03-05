@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {Badge, Button, notification, Popconfirm, Progress, Table } from 'antd';
 import axios from 'axios';
-import fetch from 'node-fetch';
 
 import './Flights.css';
 
@@ -112,7 +111,7 @@ class Flights extends Component<Props, State> {
     this.forceUpdate()
 
     // Perform delete
-    await fetch('/api/flights/delete', {
+    await fetch('http://localhost:5000/api/flights/delete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -166,7 +165,7 @@ class Flights extends Component<Props, State> {
   fetchFlights = async () => {
     this.setState({ loading: true });
 
-    const response = await fetch('/api/flights', {
+    const response = await fetch('http://localhost:5000/api/flights', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
