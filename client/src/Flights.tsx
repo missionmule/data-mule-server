@@ -167,7 +167,6 @@ class Flights extends Component<Props, State> {
 
     const response = await fetch('http://192.168.4.1:5000/api/flights', {
       method: 'POST',
-      mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
