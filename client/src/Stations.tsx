@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { notification, Switch, Table } from 'antd';
-import fetch from 'node-fetch';
 
 import './Stations.css';
 
