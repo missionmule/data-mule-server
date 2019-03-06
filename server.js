@@ -7,7 +7,7 @@ const sqlite3 = require('sqlite3').verbose();
 const app = express();
 const port = process.env.PORT || 5000;
 
-const db_path = '/var/lib/avionics.db';
+const db_path = process.env.NODE_ENV === 'production' ? '/var/lib/avionics.db' : 'avionics.db';
 
 // Connect to avionics database
 let db = new sqlite3.Database(db_path, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
@@ -114,8 +114,13 @@ app.get('/api/download', (req, res) => {
     throw err;
   });
 
+  const downloadDir = process.env.NODE_ENV === 'production' ? '/srv/' : './downloads/';
+
+  // Avoid error thrown when checking directory that doesn't exist
+  if (!fs.existsSync(downloadDir)) fs.mkdirSync(downloadDir);
+
   archive.pipe(output);
-  archive.directory('/srv/');
+  archive.directory(downloadDir);
   archive.finalize();
 
 });
@@ -124,10 +129,12 @@ app.get('/api/delete', (req, res) => {
 
   console.log("Emptying download directory...");
 
-  // Avoid error thrown when checking directory that doesn't exist
-  if (!fs.existsSync('/srv/')) fs.mkdirSync('/srv/');
+  const downloadDir = process.env.NODE_ENV === 'production' ? '/srv/' : './downloads/';
 
-  var files = fs.readdirSync('/srv/');
+  // Avoid error thrown when checking directory that doesn't exist
+  if (!fs.existsSync(downloadDir)) fs.mkdirSync(downloadDir);
+
+  var files = fs.readdirSync(downloadDir);
 
   // Custom HTTP response code for 'Nothing to delete'
   if (files.length == 0) {
@@ -149,10 +156,10 @@ app.get('/api/delete', (req, res) => {
       }
     };
 
-    deleteFolderRecursive('/srv/');
+    deleteFolderRecursive(downloadDir);
 
     // Create a clean, empty directory
-    fs.mkdirSync('/srv/');
+    fs.mkdirSync(downloadDir);
 
     console.log("Download directory emptied");
 
@@ -235,8 +242,9 @@ app.post('/api/flights/delete', (req, res) => {
     if (err) console.log(err);
   });
 
+  const downloadDir = process.env.NODE_ENV === 'production' ? '/srv/' : './downloads/';
   // Next, delete data from the flight
-  const deletePath = `/srv/${flight.flight_id}`;
+  const deletePath = `${downloadDir}${flight.flight_id}`;
 
   // Avoid error thrown when checking directory that doesn't exist
   if (!fs.existsSync(deletePath)) fs.mkdirSync(deletePath);
@@ -273,7 +281,8 @@ app.post('/api/flights/delete', (req, res) => {
 app.post('/api/flights/download', (req, res) => {
 
   const flight = req.body;
-  const downloadPath = `/srv/${flight.flight_id}`;
+  const downloadDir = process.env.NODE_ENV === 'production' ? '/srv/' : './downloads/';
+  const downloadPath = `${downloadDir}${flight.flight_id}`;
 
   // Avoid error thrown when checking directory that doesn't exist
   if (!fs.existsSync(downloadPath)) fs.mkdirSync(downloadPath);
@@ -305,8 +314,10 @@ app.post('/api/flights/download', (req, res) => {
       throw err;
     });
 
+    const downloadDir = process.env.NODE_ENV === 'production' ? '/srv/' : './downloads/';
+
     archive.pipe(output);
-    archive.directory(`/srv/${flight.flight_id}`);
+    archive.directory(`${downloadDir}${flight.flight_id}`);
     archive.finalize();
   };
 })

@@ -35,11 +35,13 @@ class Stations extends Component<Props, State> {
     this.fetchAll();
   }
 
+  server = process.env.NODE_ENV === 'production' ? 'http://192.168.4.1' : 'http://localhost';
+
   toggleRedownload = async (station: Station) => {
 
     const oldRedownload = station.redownload;
 
-    fetch('http://192.168.4.1:5000/api/stations/update', {
+    fetch(this.server + ':5000/api/stations/update', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -90,7 +92,7 @@ class Stations extends Component<Props, State> {
   fetchAll = async () => {
     this.setState({ loading: true });
 
-    const response = await fetch('http://192.168.4.1:5000/api/stations', {
+    const response = await fetch(this.server + ':5000/api/stations', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -42,6 +42,8 @@ class Flights extends Component<Props, State> {
     loadingDeleteAll: false,
   };
 
+  server = process.env.NODE_ENV === 'production' ? 'http://192.168.4.1' : 'http://localhost';
+
   componentDidMount() {
     this.fetchFlights();
 
@@ -69,7 +71,7 @@ class Flights extends Component<Props, State> {
     this.forceUpdate()
 
     await axios({
-      url: 'http:192.168.4.1:5000/api/flights/download',
+      url: this.server + ':5000/api/flights/download',
       method: 'POST',
       data: JSON.stringify({
         flight_id: record.flight_id,
@@ -111,7 +113,7 @@ class Flights extends Component<Props, State> {
     this.forceUpdate()
 
     // Perform delete
-    await fetch('http://192.168.4.1:5000/api/flights/delete', {
+    await fetch(this.server + ':5000/api/flights/delete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -165,7 +167,7 @@ class Flights extends Component<Props, State> {
   fetchFlights = async () => {
     this.setState({ loading: true });
 
-    const response = await fetch('http://192.168.4.1:5000/api/flights', {
+    const response = await fetch(this.server + ':5000/api/flights', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
