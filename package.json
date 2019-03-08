@@ -7,7 +7,7 @@
     "client-prod": "cd client && yarn build && serve -s build/ -l 3000",
     "server": "nodemon server.js",
     "setup": "yarn install && cd client && yarn install",
-    "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
+    "dev": "export NODE_ENV=development && concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
   },
   "dependencies": {
     "archiver": "^3.0.0",

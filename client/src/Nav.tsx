@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Layout, Menu, Icon, } from 'antd';
 import {ReactComponent as Airplane} from './img/airplane.svg';
 import {ReactComponent as PhotoCamera} from './img/photo-camera.svg';
+import {ReactComponent as Settings} from './img/settings.svg';
 import logo from './img/mm.png';
 
 import './Nav.css';
@@ -48,6 +49,14 @@ class Nav extends Component {
               // @ts-ignore */}
               <Icon component={PhotoCamera}/>
               <span>Data Stations</span>
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="4">
+            <Link to="/advanced">
+            {/*
+              // @ts-ignore */}
+              <Icon component={Settings}/>
+              <span>Advanced</span>
             </Link>
           </Menu.Item>
         </Menu>

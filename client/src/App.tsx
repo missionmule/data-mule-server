@@ -8,6 +8,7 @@ import Flights from './Flights';
 import Home from './Home';
 import Nav from './Nav';
 import Stations from './Stations';
+import Advanced from './Advanced';
 
 import './App.css';
 
@@ -35,7 +36,13 @@ class App extends Component {
 
   // Verifies that the API is up and running
   callApi = async () => {
-    const response = await fetch(this.server + ':5000/api/hello');
+    const response = await fetch(this.server + ':5000/api/hello', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
     return body;
@@ -112,6 +119,7 @@ class App extends Component {
                   <Route exact path="/" component={Home} />
                   <Route path="/flights" component={Flights} />
                   <Route path="/stations"  component={Stations} />
+                  <Route path="/advanced"  component={Advanced} />
                 </div>
               </Content>
               <Footer style={{ textAlign: 'center' }}>

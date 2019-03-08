@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Badge, Button, notification, Popconfirm, Progress, Table } from 'antd';
+import {Badge, Button, notification, Popconfirm, Popover, Progress, Table, Timeline } from 'antd';
 import axios from 'axios';
 
 import './Flights.css';
@@ -22,6 +22,10 @@ interface Station {
   station_id: string;
   successful_downloads: number;
   total_files: number;
+  did_wake_up_ack: string;
+  did_connect: string;
+  did_find_device: string;
+  did_shutdown_ack: string;
 }
 
 interface Flight {
@@ -183,22 +187,44 @@ class Flights extends Component<Props, State> {
     });
   }
 
+  getTimeline = (station: Station) => {
+    const { did_wake_up_ack, did_connect, did_find_device, did_shutdown_ack, total_files, successful_downloads } = { ...station }
+    return (
+      <Timeline style={{marginTop: '10px', marginBottom: '-40px'}}>
+        <Timeline.Item color={did_wake_up_ack ? "green" : "red"}>Wake up data station</Timeline.Item>
+        <Timeline.Item color={did_connect ? "green" : "red"}>Connect to data station</Timeline.Item>
+        <Timeline.Item color={did_find_device ? "green" : "red"}>Connect to data station sensor</Timeline.Item>
+        <Timeline.Item color={(total_files != 0 && successful_downloads == total_files) ? "green" : "red"}>Download all available data</Timeline.Item>
+        <Timeline.Item color={did_shutdown_ack ? "green" : "red"}>Shut down data station</Timeline.Item>
+      </Timeline>
+    );
+  }
+
   statusBadge = (station: Station) => {
-    const percent = station.successful_downloads/station.total_files*100;
-    if (percent <= 0) {
-      return <span><Badge status="error" />Failure</span>
-    } else if (percent < 100) {
-      return <span><Badge status="warning" />Incomplete</span>
+
+    const timeline = this.getTimeline(station);
+
+    const { did_wake_up_ack, did_connect, did_find_device, did_shutdown_ack, total_files, successful_downloads } = { ...station }
+    console.log(station)
+    let badge = null;
+    if (did_wake_up_ack == '1' && did_connect == '1' && did_find_device == '1' && did_find_device == '1' && did_shutdown_ack == '1' && successful_downloads == total_files) {
+      badge = <span><Badge status="success" />Complete</span>
     } else {
-      return <span><Badge status="success" />Complete</span>
+      badge = <span><Badge status="warning" />Incomplete</span>
     }
+
+    return (
+      <Popover content={timeline} title={"Download History"}>
+        {badge}
+      </Popover>
+    )
   }
 
   expandedRowRender = (record: Flight) => {
     const columns = [
       { title: 'Data Station ID', width: '20%', dataIndex: 'station_id', key: 'station_id' },
       { title: 'Percent Downloaded', dataIndex: 'percent', key: 'percent', render: (text: string, record: Station) => (
-        <span><Progress percent={record.total_files == 0 ? 100 : record.successful_downloads/record.total_files*100} /></span>
+        <span><Progress percent={record.total_files == 0 ? 100 : Math.round(record.successful_downloads/record.total_files*100)} /></span>
       )},
       { title: 'Downloaded Files', width: '15%', dataIndex: 'successful_downloads', key: 'successful_downloads'},
       { title: 'Total Files', width: '15%',dataIndex: 'total_files', key: 'total_files'},

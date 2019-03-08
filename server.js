@@ -9,6 +9,12 @@ const port = process.env.PORT || 5000;
 
 const db_path = process.env.NODE_ENV === 'production' ? '/var/lib/avionics.db' : 'avionics.db';
 
+if (process.env.NODE_ENV === 'production') {
+  console.log("[PRODUCTION]");
+} else {
+  console.log("[DEVELOPMENT]");
+}
+
 // Connect to avionics database
 let db = new sqlite3.Database(db_path, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
   if (err) {
@@ -22,7 +28,7 @@ db.run('CREATE TABLE IF NOT EXISTS flights(flight_id INTEGER PRIMARY KEY AUTOINC
 
 db.run('CREATE TABLE IF NOT EXISTS stations(station_id INTEGER PRIMARY KEY, last_visited DATETIME, redownload INTEGER)');
 
-db.run('CREATE TABLE IF NOT EXISTS flights_stations(flight_id INTEGER, station_id INTEGER, successful_downloads INTEGER, total_files INTEGER)');
+db.run('CREATE TABLE IF NOT EXISTS flights_stations(flight_id INTEGER, station_id INTEGER, successful_downloads INTEGER, total_files INTEGER, did_wake_up_ack INTEGER, did_connect INTEGER, did_find_device INTEGER, did_shutdown_ack INTEGER)');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -189,7 +195,7 @@ async function getFlights() {
 }
 
 async function getStations(flight) {
-  let sql = `SELECT station_id, successful_downloads, total_files FROM flights_stations WHERE flight_id = ${flight.flight_id}`;
+  let sql = `SELECT station_id, successful_downloads, total_files, total_files, did_wake_up_ack, did_connect, did_find_device, did_shutdown_ack FROM flights_stations WHERE flight_id = ${flight.flight_id}`;
   return new Promise(function(resolve, reject) {
     db.all(sql, [], (err, stations) => {
       if (err) reject(err);
