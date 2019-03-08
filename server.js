@@ -51,10 +51,12 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.get('/api/logs', (req, res) => {
+app.post('/api/logs/download', (req, res) => {
 
   var output = fs.createWriteStream('data.zip');
   var archive = archiver('zip');
+
+  const logPath = process.env.NODE_ENV === 'production' ? '/var/logs/mission-mule-flight.log' : './flight.log';
 
   output.on('close', function () {
     console.log("Zipping complete");
@@ -83,9 +85,23 @@ app.get('/api/logs', (req, res) => {
   });
 
   archive.pipe(output);
-  archive.file('/var/log/mission-mule-flight.log');
+  archive.file(logPath);
   archive.finalize();
 });
+
+app.post('/api/logs/delete', (req, res) => {
+  const logPath = process.env.NODE_ENV === 'production' ? '/var/logs/mission-mule-flight.log' : './flight.log';
+
+  if (fs.existsSync(logPath)) { // Avoid file doesnt exist error
+    fs.unlinkSync(logPath);
+  }
+
+  // Create a new, empty file
+  fs.closeSync(fs.openSync(logPath, 'w'));
+
+  // Let the client know that the request is complete
+  res.sendStatus(200);
+})
 
 app.get('/api/download', (req, res) => {
 
@@ -326,6 +342,53 @@ app.post('/api/flights/download', (req, res) => {
     archive.directory(`${downloadDir}${flight.flight_id}`);
     archive.finalize();
   };
+})
+
+// Delete all flight records in avionics.db, all downloaded data, and clear logs
+app.post('/api/reset', (req, res) => {
+  // Wipe database
+  db.run('DELETE FROM flights');
+  db.run('DELETE FROM stations');
+  db.run('DELETE FROM flights_stations');
+  db.run('VACUUM');
+
+  const deletePath = process.env.NODE_ENV === 'production' ? '/srv/' : './downloads/';
+
+  // Avoid error thrown when checking directory that doesn't exist
+  if (!fs.existsSync(deletePath)) fs.mkdirSync(deletePath);
+
+  // Remove download data
+  var deleteFolderRecursive = function(path) {
+    if( fs.existsSync(path) ) {
+      fs.readdirSync(path).forEach(function(file,index){
+        var curPath = path + "/" + file;
+        if(fs.lstatSync(curPath).isDirectory()) { // recurse
+          deleteFolderRecursive(curPath);
+        } else { // delete file
+          fs.unlinkSync(curPath);
+        }
+      });
+      fs.rmdirSync(path);
+    }
+  };
+
+  deleteFolderRecursive(deletePath);
+
+  // Accounts for edge case of deletion of an empty directory from failed in-flight download
+  if (fs.existsSync(deletePath)) fs.rmdirSync(deletePath);
+
+  // Delete logs
+  const logPath = process.env.NODE_ENV === 'production' ? '/var/logs/mission-mule-flight.log' : './flight.log';
+
+  if (fs.existsSync(logPath)) { // Avoid file doesnt exist error
+    fs.unlinkSync(logPath);
+  }
+
+  // Create a new, empty file
+  fs.closeSync(fs.openSync(logPath, 'w'));
+
+  // Let the client know that the request is complete
+  res.sendStatus(200);
 })
 
 const server = app.listen(port, () => console.log(`Listening on port ${port}`));

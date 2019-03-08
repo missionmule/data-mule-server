@@ -26,3 +26,4 @@ yarn-error.log*
 # development
 /download
 /avionics.db
+/flight.log

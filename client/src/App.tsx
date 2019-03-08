@@ -25,13 +25,7 @@ class App extends Component {
     deleteInProgress: false,
     downloadInProgress: false,
   };
-
-  componentDidMount() {
-    this.callApi()
-      .then(res => this.setState({ response: res.express }))
-      .catch(err => console.log(err));
-  }
-
+  
   server = process.env.NODE_ENV === 'production' ? 'http://192.168.4.1' : 'http://localhost';
 
   // Verifies that the API is up and running

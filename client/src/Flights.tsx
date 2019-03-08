@@ -205,7 +205,6 @@ class Flights extends Component<Props, State> {
     const timeline = this.getTimeline(station);
 
     const { did_wake_up_ack, did_connect, did_find_device, did_shutdown_ack, total_files, successful_downloads } = { ...station }
-    console.log(station)
     let badge = null;
     if (did_wake_up_ack == '1' && did_connect == '1' && did_find_device == '1' && did_find_device == '1' && did_shutdown_ack == '1' && successful_downloads == total_files) {
       badge = <span><Badge status="success" />Complete</span>
