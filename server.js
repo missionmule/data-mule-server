@@ -358,6 +358,9 @@ app.post('/api/reset', (req, res) => {
 
   deleteFolderRecursive(deletePath);
 
+  // Create clean directory
+  fs.mkdirSync(deletePath)
+
   // Accounts for edge case of deletion of an empty directory from failed in-flight download
   if (fs.existsSync(deletePath)) fs.rmdirSync(deletePath);
 
