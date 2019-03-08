@@ -194,7 +194,7 @@ class Flights extends Component<Props, State> {
         <Timeline.Item color={did_wake_up_ack ? "green" : "red"}>Wake up data station</Timeline.Item>
         <Timeline.Item color={did_connect ? "green" : "red"}>Connect to data station</Timeline.Item>
         <Timeline.Item color={did_find_device ? "green" : "red"}>Connect to data station sensor</Timeline.Item>
-        <Timeline.Item color={(total_files != 0 && successful_downloads == total_files) ? "green" : "red"}>Download all available data</Timeline.Item>
+        <Timeline.Item color={did_wake_up_ack && did_connect && did_find_device && (successful_downloads == total_files) ? "green" : "red"}>Download all available data</Timeline.Item>
         <Timeline.Item color={did_shutdown_ack ? "green" : "red"}>Shut down data station</Timeline.Item>
       </Timeline>
     );
@@ -205,8 +205,9 @@ class Flights extends Component<Props, State> {
     const timeline = this.getTimeline(station);
 
     const { did_wake_up_ack, did_connect, did_find_device, did_shutdown_ack, total_files, successful_downloads } = { ...station }
+
     let badge = null;
-    if (did_wake_up_ack == '1' && did_connect == '1' && did_find_device == '1' && did_find_device == '1' && did_shutdown_ack == '1' && successful_downloads == total_files) {
+    if (did_wake_up_ack == '1' && did_connect == '1' && did_find_device == '1' && did_shutdown_ack == '1' && (successful_downloads === total_files)) {
       badge = <span><Badge status="success" />Complete</span>
     } else {
       badge = <span><Badge status="warning" />Incomplete</span>
@@ -219,11 +220,20 @@ class Flights extends Component<Props, State> {
     )
   }
 
+  progressStatus = (station: Station) => {
+      const { did_wake_up_ack, did_connect, did_find_device, did_shutdown_ack, total_files, successful_downloads } = { ...station }
+      if (did_wake_up_ack == '1' && did_connect == '1' && did_find_device == '1' && did_shutdown_ack == '1' && (successful_downloads === total_files)) {
+        if (successful_downloads === total_files) return ('success');
+        else return ('normal');
+      } else return ('exception');
+  }
+
+
   expandedRowRender = (record: Flight) => {
     const columns = [
       { title: 'Data Station ID', width: '20%', dataIndex: 'station_id', key: 'station_id' },
       { title: 'Percent Downloaded', dataIndex: 'percent', key: 'percent', render: (text: string, record: Station) => (
-        <span><Progress percent={record.total_files == 0 ? 100 : Math.round(record.successful_downloads/record.total_files*100)} /></span>
+        <span><Progress percent={(record.total_files == 0 ? 100 : Math.round(record.successful_downloads/record.total_files*100))} status={this.progressStatus(record)}/></span>
       )},
       { title: 'Downloaded Files', width: '15%', dataIndex: 'successful_downloads', key: 'successful_downloads'},
       { title: 'Total Files', width: '15%',dataIndex: 'total_files', key: 'total_files'},
