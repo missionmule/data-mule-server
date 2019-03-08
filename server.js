@@ -56,7 +56,7 @@ app.post('/api/logs/download', (req, res) => {
   var output = fs.createWriteStream('data.zip');
   var archive = archiver('zip');
 
-  const logPath = process.env.NODE_ENV === 'production' ? '/var/logs/mission-mule-flight.log' : './flight.log';
+  const logPath = process.env.NODE_ENV === 'production' ? '/var/log/mission-mule-flight.log' : './flight.log';
 
   output.on('close', function () {
     console.log("Zipping complete");
@@ -90,7 +90,7 @@ app.post('/api/logs/download', (req, res) => {
 });
 
 app.post('/api/logs/delete', (req, res) => {
-  const logPath = process.env.NODE_ENV === 'production' ? '/var/logs/mission-mule-flight.log' : './flight.log';
+  const logPath = process.env.NODE_ENV === 'production' ? '/var/log/mission-mule-flight.log' : './flight.log';
 
   if (fs.existsSync(logPath)) { // Avoid file doesnt exist error
     fs.unlinkSync(logPath);
@@ -378,7 +378,7 @@ app.post('/api/reset', (req, res) => {
   if (fs.existsSync(deletePath)) fs.rmdirSync(deletePath);
 
   // Delete logs
-  const logPath = process.env.NODE_ENV === 'production' ? '/var/logs/mission-mule-flight.log' : './flight.log';
+  const logPath = process.env.NODE_ENV === 'production' ? '/var/log/mission-mule-flight.log' : './flight.log';
 
   if (fs.existsSync(logPath)) { // Avoid file doesnt exist error
     fs.unlinkSync(logPath);
