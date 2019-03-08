@@ -228,12 +228,19 @@ class Flights extends Component<Props, State> {
       } else return ('exception');
   }
 
+  progressPercent = (station: Station) => {
+    const { did_wake_up_ack, did_connect, did_find_device, did_shutdown_ack, total_files, successful_downloads } = { ...station }
+    if (did_wake_up_ack == '1' && did_connect == '1' && did_find_device == '1') {
+      return (total_files == 0 ? 100 : Math.round(successful_downloads/total_files*100));
+    } else return 0;
+  }
+
 
   expandedRowRender = (record: Flight) => {
     const columns = [
       { title: 'Data Station ID', width: '20%', dataIndex: 'station_id', key: 'station_id' },
       { title: 'Percent Downloaded', dataIndex: 'percent', key: 'percent', render: (text: string, record: Station) => (
-        <span><Progress percent={(record.total_files == 0 ? 100 : Math.round(record.successful_downloads/record.total_files*100))} status={this.progressStatus(record)}/></span>
+        <span><Progress percent={this.progressPercent(record)} status={this.progressStatus(record)}/></span>
       )},
       { title: 'Downloaded Files', width: '15%', dataIndex: 'successful_downloads', key: 'successful_downloads'},
       { title: 'Total Files', width: '15%',dataIndex: 'total_files', key: 'total_files'},
