@@ -59,11 +59,8 @@ app.post('/api/logs/download', (req, res) => {
   const logPath = process.env.NODE_ENV === 'production' ? '/var/log/mission-mule-flight.log' : './flight.log';
 
   output.on('close', function () {
-    console.log("Zipping complete");
 
     const src = fs.createReadStream('./data.zip');
-
-    console.log("Beginning download...");
 
     // Pipe read stream to client
     src.pipe(res);
@@ -74,7 +71,6 @@ app.post('/api/logs/download', (req, res) => {
 
     // Once the piped download is complete, delete the generated zip
     src.on('close', () => {
-      console.log("Download complete");
       fs.unlinkSync('./data.zip');
     });
 
@@ -105,17 +101,11 @@ app.post('/api/logs/delete', (req, res) => {
 
 app.get('/api/download', (req, res) => {
 
-  console.log("Zipping files...");
-
   var output = fs.createWriteStream('data.zip');
   var archive = archiver('zip');
 
   output.on('close', function () {
-    console.log("Zipping complete");
-
     const src = fs.createReadStream('./data.zip');
-
-    console.log("Beginning download...");
 
     // Pipe read stream to client
     src.pipe(res);
@@ -126,7 +116,6 @@ app.get('/api/download', (req, res) => {
 
     // Once the piped download is complete, delete the generated zip
     src.on('close', () => {
-      console.log("Download complete");
       fs.unlinkSync('./data.zip');
     });
 
@@ -149,8 +138,6 @@ app.get('/api/download', (req, res) => {
 
 app.get('/api/delete', (req, res) => {
 
-  console.log("Emptying download directory...");
-
   const downloadDir = process.env.NODE_ENV === 'production' ? '/srv/' : './downloads/';
 
   // Avoid error thrown when checking directory that doesn't exist
@@ -160,7 +147,6 @@ app.get('/api/delete', (req, res) => {
 
   // Custom HTTP response code for 'Nothing to delete'
   if (files.length == 0) {
-    console.log("Nothing to delete");
     res.statusMessage = "Nothing to delete";
     res.status(540).end();
   } else {
@@ -182,8 +168,6 @@ app.get('/api/delete', (req, res) => {
 
     // Create a clean, empty directory
     fs.mkdirSync(downloadDir);
-
-    console.log("Download directory emptied");
 
     // Let the client know that the request is complete
     res.sendStatus(200);
