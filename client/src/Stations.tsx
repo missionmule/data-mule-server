@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { notification, Switch, Table } from 'antd';
+import { Button, Drawer, Form, Col, Row, Input, Select, Icon, notification, Switch, Table } from 'antd';
 
 import './Stations.css';
+import NewDataStationForm from './NewDataStationForm';
 
 interface Match {
   url: string;
@@ -15,6 +16,8 @@ interface State {
   data: any[];
   pagination: object;
   loading: boolean;
+  insertStationLoading: boolean;
+  drawerVisible: boolean;
 }
 
 interface Station {
@@ -29,6 +32,8 @@ class Stations extends Component<Props, State> {
     data: [],
     pagination: {},
     loading: false,
+    insertStationLoading: false,
+    drawerVisible: false,
   };
 
   componentDidMount() {
@@ -37,7 +42,10 @@ class Stations extends Component<Props, State> {
 
   server = process.env.NODE_ENV === 'production' ? 'http://192.168.4.1' : 'http://localhost';
 
-  toggleRedownload = async (station: Station) => {
+  toggleRedownload = async (station: Station, checked: boolean, e: Event) => {
+
+    e.preventDefault();
+    e.stopPropagation();
 
     const oldRedownload = station.redownload;
 
@@ -70,6 +78,9 @@ class Stations extends Component<Props, State> {
       });
     }
 
+    // Ugly, bug fixes weird bug where redownload is ordered, but no visual is made unless the user refreshes
+    this.fetchAll();
+
   }
 
   findStationStateIndex= (record: Station) => {
@@ -82,8 +93,11 @@ class Stations extends Component<Props, State> {
     { title: 'Last Visted', dataIndex: 'last_visited', key: 'last_visited' },
     { title: 'Redownload', dataIndex: 'redownload', key: 'redownload',
       render: (text: string, record: Station) => (
-        <span onClick={e => {e.preventDefault(); e.stopPropagation(); this.toggleRedownload(record);}}>
-          <Switch checked={Boolean(this.state.data[this.findStationStateIndex(record)].redownload)}/>
+        <span >
+          <Switch
+            onClick={(checked: boolean, event: Event) => {this.toggleRedownload(record, checked, event)}}
+            checked={Boolean(this.state.data[this.findStationStateIndex(record)].redownload)}
+          />
         </span>
       ),
     },
@@ -109,11 +123,44 @@ class Stations extends Component<Props, State> {
 
   }
 
+  showDrawer = () => {
+    this.setState({
+      drawerVisible: true,
+    });
+  };
+
+  onClose = () => {
+    this.setState({
+      drawerVisible: false,
+    });
+  };
+
+  insertStation = async (values: any) => {
+    await fetch(this.server + ':5000/api/stations/insert', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        station_id: values.station_id,
+      }),
+    })
+
+    this.fetchAll();
+
+    this.setState({
+      insertStationLoading: false,
+    });
+  }
+
   render() {
     return (
       <div>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flexStart', width: '100%'}}>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flexStart', width: '100%'}}>
           <h1 style={{ fontWeight: 600, fontSize: '20px'}}>Data Stations</h1>
+          <Button type="primary" onClick={this.showDrawer}>
+            <Icon type="plus" /> New data station
+          </Button>
         </div>
         <Table
           columns={this.columns}
@@ -122,6 +169,19 @@ class Stations extends Component<Props, State> {
           loading={this.state.loading}
           bordered
         />
+        <Drawer
+          title="Add a new data station"
+          width={360}
+          onClose={this.onClose}
+          visible={this.state.drawerVisible}
+          style={{
+            overflow: 'auto',
+            height: 'calc(100% - 108px)',
+            paddingBottom: '108px',
+          }}
+        >
+          <NewDataStationForm closeDrawer = {this.onClose} insertStation = {this.insertStation}/>
+        </Drawer>
       </div>
     );
   }

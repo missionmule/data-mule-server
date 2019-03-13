@@ -213,6 +213,15 @@ app.post('/api/stations/update', (req, res) => {
   });
 })
 
+app.post('/api/stations/insert', (req, res) => {
+  const station_id = req.body.station_id;
+  let sql = `INSERT INTO stations (station_id, last_visited, redownload) VALUES (${station_id}, datetime('now'), 0)`;
+  db.run(sql, [], function(err) {
+    if (err) console.log(err);
+    res.send("OK");
+  });
+});
+
 app.post('/api/flights', async (req, res) => {
 
   let flightsStations = [];
