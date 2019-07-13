@@ -22,10 +22,16 @@ interface Station {
   station_id: string;
   successful_downloads: number;
   total_files: number;
+  total_data_downloaded_mb: number;
+  download_speed_mbps: number;
   did_wake_up_ack: string;
   did_connect: string;
   did_find_device: string;
   did_shutdown_ack: string;
+  wakeup_time_s: number;
+  connection_time_s: number;
+  download_time_s: number;
+  shutdown_time_s: number;
 }
 
 interface Flight {
@@ -68,7 +74,7 @@ class Flights extends Component<Props, State> {
   onClickDownload = async (record: Flight) => {
     const index = this.findFlightStateIndex(record);
 
-    // tl;dr: Ugly, it gets the job done and I'd like to go home at some point :)
+    // tl;dr: Ugly, but it gets the job done and I'd like to go home at some point :)
     // Also, this only affects behavior if we use the shouldComponentUpdate()
     // lifecycle method, which we aren't
     this.state.data[index].downloadInProgress = true;
@@ -188,14 +194,26 @@ class Flights extends Component<Props, State> {
   }
 
   getTimeline = (station: Station) => {
-    const { did_wake_up_ack, did_connect, did_find_device, did_shutdown_ack, total_files, successful_downloads } = { ...station }
+    const { did_wake_up_ack, did_connect, did_find_device, did_shutdown_ack, total_files, successful_downloads, wakeup_time_s, connection_time_s, download_time_s, shutdown_time_s } = { ...station }
     return (
-      <Timeline style={{marginTop: '10px', marginBottom: '-40px'}}>
-        <Timeline.Item color={did_wake_up_ack ? "green" : "red"}>Wake up data station</Timeline.Item>
-        <Timeline.Item color={did_connect ? "green" : "red"}>Connect to data station</Timeline.Item>
+      <Timeline style={{marginTop: '10px', marginBottom: '-20px'}}>
+        <Timeline.Item color={did_wake_up_ack ? "green" : "red"}>
+          Wake up data station<br/>
+          Wake up time: {wakeup_time_s}s
+        </Timeline.Item>
+        <Timeline.Item color={did_connect ? "green" : "red"}>
+          Connect to data station<br/>
+          Connection time: {connection_time_s}s
+        </Timeline.Item>
         <Timeline.Item color={did_find_device ? "green" : "red"}>Connect to data station sensor</Timeline.Item>
-        <Timeline.Item color={did_wake_up_ack && did_connect && did_find_device && (successful_downloads == total_files) ? "green" : "red"}>Download all available data</Timeline.Item>
-        <Timeline.Item color={did_shutdown_ack ? "green" : "red"}>Shut down data station</Timeline.Item>
+        <Timeline.Item color={did_wake_up_ack && did_connect && did_find_device && (successful_downloads == total_files) ? "green" : "red"}>
+          Download all available data<br/>
+          Download time: {download_time_s}s
+        </Timeline.Item>
+        <Timeline.Item color={did_shutdown_ack ? "green" : "red"}>
+          Shut down data station<br/>
+          Shutdown time: {shutdown_time_s}s
+        </Timeline.Item>
       </Timeline>
     );
   }
@@ -238,12 +256,14 @@ class Flights extends Component<Props, State> {
 
   expandedRowRender = (record: Flight) => {
     const columns = [
-      { title: 'Data Station ID', width: '20%', dataIndex: 'station_id', key: 'station_id' },
+      { title: 'Data Station ID', width: '10%', dataIndex: 'station_id', key: 'station_id' },
       { title: 'Percent Downloaded', dataIndex: 'percent', key: 'percent', render: (text: string, record: Station) => (
         <span><Progress percent={this.progressPercent(record)} status={this.progressStatus(record)}/></span>
       )},
       { title: 'Downloaded Files', width: '15%', dataIndex: 'successful_downloads', key: 'successful_downloads'},
       { title: 'Total Files', width: '15%',dataIndex: 'total_files', key: 'total_files'},
+      { title: 'Total Data Downloaded (mb)', width: '15%', dataIndex: 'total_data_downloaded_mb', key: 'total_data_downloaded_mb'},
+      { title: 'Average Download Speed (Mbps)', width: '15%', dataIndex: 'download_speed_mbps', key: 'download_speed_mbps'},
       { title: 'Status', rowKey: 'status', render: (text: string, record: Station) => (this.statusBadge(record)) },
     ];
 
