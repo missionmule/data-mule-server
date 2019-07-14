@@ -199,20 +199,20 @@ class Flights extends Component<Props, State> {
       <Timeline style={{marginTop: '10px', marginBottom: '-20px'}}>
         <Timeline.Item color={did_wake_up_ack ? "green" : "red"}>
           Wake up data station<br/>
-          Wake up time: {wakeup_time_s}s
+          Wake up time: {Math.round(wakeup_time_s)}s
         </Timeline.Item>
         <Timeline.Item color={did_connect ? "green" : "red"}>
           Connect to data station<br/>
-          Connection time: {connection_time_s}s
+          Connection time: {Math.round(connection_time_s)}s
         </Timeline.Item>
         <Timeline.Item color={did_find_device ? "green" : "red"}>Connect to data station sensor</Timeline.Item>
         <Timeline.Item color={did_wake_up_ack && did_connect && did_find_device && (successful_downloads == total_files) ? "green" : "red"}>
           Download all available data<br/>
-          Download time: {download_time_s}s
+          Download time: {Math.round(download_time_s)}s
         </Timeline.Item>
         <Timeline.Item color={did_shutdown_ack ? "green" : "red"}>
           Shut down data station<br/>
-          Shutdown time: {shutdown_time_s}s
+          Shutdown time: {Math.round(shutdown_time_s)}s
         </Timeline.Item>
       </Timeline>
     );
