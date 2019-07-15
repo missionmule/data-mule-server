@@ -351,7 +351,7 @@ app.post('/api/reset', (req, res) => {
 
   // Reset timeouts to default values
   db.run(`UPDATE timeouts SET time_in_min=4 WHERE timeout_id='wakeup'`);
-  db.run(`UPDATE timeouts SET time_in_min=2 WHERE timeout_id='connection'`);
+  db.run(`UPDATE timeouts SET time_in_min=4 WHERE timeout_id='connection'`);
   db.run(`UPDATE timeouts SET time_in_min=10 WHERE timeout_id='download'`);
   db.run(`UPDATE timeouts SET time_in_min=2 WHERE timeout_id='shutdown'`);
 
