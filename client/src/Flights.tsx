@@ -253,7 +253,6 @@ class Flights extends Component<Props, State> {
     } else return 0;
   }
 
-
   expandedRowRender = (record: Flight) => {
     const columns = [
       { title: 'Data Station ID', width: '10%', dataIndex: 'station_id', key: 'station_id' },
@@ -262,8 +261,12 @@ class Flights extends Component<Props, State> {
       )},
       { title: 'Downloaded Files', width: '15%', dataIndex: 'successful_downloads', key: 'successful_downloads'},
       { title: 'Total Files', width: '15%',dataIndex: 'total_files', key: 'total_files'},
-      { title: 'Total Data Downloaded (mb)', width: '15%', dataIndex: 'total_data_downloaded_mb', key: 'total_data_downloaded_mb'},
-      { title: 'Average Download Speed (Mbps)', width: '15%', dataIndex: 'download_speed_mbps', key: 'download_speed_mbps'},
+      { title: 'Total Data Downloaded (MB)', width: '15%', dataIndex: 'total_data_downloaded_mb', render: (text: string, record: Station) => {
+        return record.total_data_downloaded_mb.toFixed(2);
+      }},
+      { title: 'Average Download Speed (Mbps)', width: '15%', dataIndex: 'download_speed_mbps',render: (text: string, record: Station) => {
+        return record.download_speed_mbps.toFixed(2);
+      }},
       { title: 'Status', rowKey: 'status', render: (text: string, record: Station) => (this.statusBadge(record)) },
     ];
 
