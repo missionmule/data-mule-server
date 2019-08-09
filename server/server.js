@@ -10,7 +10,7 @@ const port = process.env.PORT || 5000;
 const db_path = process.env.NODE_ENV === 'production' ? '/var/lib/avionics.db' : 'avionics.db';
 
 if (process.env.NODE_ENV === 'production') {
-  console.log("[PRODUCTION]");
+  console.log("[PRODUCTION]")
 } else {
   console.log("[DEVELOPMENT]");
 }
@@ -28,7 +28,11 @@ db.run('CREATE TABLE IF NOT EXISTS flights(flight_id INTEGER PRIMARY KEY AUTOINC
 
 db.run('CREATE TABLE IF NOT EXISTS stations(station_id INTEGER PRIMARY KEY, last_visited DATETIME, redownload INTEGER)');
 
-db.run('CREATE TABLE IF NOT EXISTS flights_stations(flight_id INTEGER, station_id INTEGER, successful_downloads INTEGER, total_files INTEGER, did_wake_up_ack INTEGER, did_connect INTEGER, did_find_device INTEGER, did_shutdown_ack INTEGER)');
+db.run('CREATE TABLE IF NOT EXISTS flights_stations(flight_id INTEGER, station_id INTEGER, successful_downloads INTEGER, total_files INTEGER, total_data_downloaded_mb FLOAT, download_speed_mbps FLOAT, did_wake_up_ack INTEGER, did_connect INTEGER, did_find_device INTEGER, did_shutdown_ack INTEGER, wakeup_time_s INTEGER, connection_time_s INTEGER, download_time_s INTEGER, shutdown_time_s INTEGER)');
+
+// Add timeouts and fill with default values
+db.run('CREATE TABLE IF NOT EXISTS timeouts(timeout_id TEXT PRIMARY KEY, time_in_min INTEGER)');
+db.run(`INSERT OR IGNORE INTO timeouts (timeout_id, time_in_min) VALUES ('wakeup', 4), ('connection', 4), ('download', 10), ('shutdown', 2)`)
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -195,7 +199,7 @@ async function getFlights() {
 }
 
 async function getStations(flight) {
-  let sql = `SELECT station_id, successful_downloads, total_files, total_files, did_wake_up_ack, did_connect, did_find_device, did_shutdown_ack FROM flights_stations WHERE flight_id = ${flight.flight_id}`;
+  let sql = `SELECT station_id, successful_downloads, total_files, total_files, total_data_downloaded_mb, download_speed_mbps, did_wake_up_ack, did_connect, did_find_device, did_shutdown_ack, wakeup_time_s, connection_time_s, download_time_s, shutdown_time_s FROM flights_stations WHERE flight_id = ${flight.flight_id}`;
   return new Promise(function(resolve, reject) {
     db.all(sql, [], (err, stations) => {
       if (err) reject(err);
@@ -345,6 +349,12 @@ app.post('/api/reset', (req, res) => {
   db.run('DELETE FROM flights_stations');
   db.run('VACUUM');
 
+  // Reset timeouts to default values
+  db.run(`UPDATE timeouts SET time_in_min=4 WHERE timeout_id='wakeup'`);
+  db.run(`UPDATE timeouts SET time_in_min=4 WHERE timeout_id='connection'`);
+  db.run(`UPDATE timeouts SET time_in_min=10 WHERE timeout_id='download'`);
+  db.run(`UPDATE timeouts SET time_in_min=2 WHERE timeout_id='shutdown'`);
+
   const deletePath = process.env.NODE_ENV === 'production' ? '/srv/' : './downloads/';
 
   // Avoid error thrown when checking directory that doesn't exist
@@ -385,6 +395,25 @@ app.post('/api/reset', (req, res) => {
 
   // Let the client know that the request is complete
   res.sendStatus(200);
+})
+
+app.post('/api/timeouts', (req, res) => {
+  let sql = `SELECT * FROM timeouts`;
+
+  db.all(sql, [], (err, timeouts) => {
+    if (err) throw err;
+
+    res.send(timeouts);
+  });
+});
+
+app.post('/api/timeouts/update', (req, res) => {
+  const update = req.body;
+  sql = `UPDATE timeouts SET time_in_min=${update.time_in_min} WHERE timeout_id='${update.timeout_id}'`;
+  db.run(sql, [], function(err) {
+    if (err) console.log(err);
+    res.send("OK");
+  });
 })
 
 const server = app.listen(port, () => console.log(`Listening on port ${port}`));

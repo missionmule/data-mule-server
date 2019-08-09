@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, List, notification, Popconfirm } from 'antd';
+import { Button, Form, InputNumber, List, notification, Popconfirm } from 'antd';
 import axios from 'axios';
 
 import './Advanced.css';
@@ -11,6 +11,14 @@ interface State {
   logDeleteIsLoading: boolean;
   logDownloadIsLoading: boolean;
   factoryResetIsLoading: boolean;
+  wakeupTimeout: number | undefined;
+  wakeupTimeoutIsLoading: boolean;
+  connectionTimeout: number | undefined;
+  connectionTimeoutIsLoading: boolean;
+  downloadTimeout: number | undefined;
+  downloadTimeoutIsLoading: boolean;
+  shutdownTimeout: number | undefined;
+  shutdownTimeoutIsLoading: boolean;
 }
 const ButtonGroup = Button.Group;
 
@@ -20,7 +28,19 @@ class Advanced extends Component<Props, State> {
     logDeleteIsLoading: false,
     logDownloadIsLoading: false,
     factoryResetIsLoading: false,
+    wakeupTimeout: 1,
+    wakeupTimeoutIsLoading: false,
+    connectionTimeout: 1,
+    connectionTimeoutIsLoading: false,
+    downloadTimeout: 1,
+    downloadTimeoutIsLoading: false,
+    shutdownTimeout: 1,
+    shutdownTimeoutIsLoading: false,
   };
+
+  componentWillMount() {
+    this.fetchAll();
+  }
 
   server = process.env.NODE_ENV === 'production' ? 'http://192.168.4.1' : 'http://localhost';
 
@@ -84,6 +104,8 @@ class Advanced extends Component<Props, State> {
       },
     })
 
+    await this.fetchAll();
+
     notification.info({
       message: 'Factory Reset Complete',
       description: 'All flight records and downloaded sensor data have been permanently deleted.',
@@ -92,6 +114,129 @@ class Advanced extends Component<Props, State> {
     this.setState({ factoryResetIsLoading: false });
   }
 
+  fetchAll = async () => {
+    this.setState({
+      wakeupTimeoutIsLoading: true,
+      connectionTimeoutIsLoading: true,
+      downloadTimeoutIsLoading: true,
+      shutdownTimeoutIsLoading: true,
+    });
+
+    const response = await fetch(this.server + ':5000/api/timeouts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({}),
+    })
+
+    const body = JSON.parse(await response.text());
+
+    this.setState({
+      wakeupTimeout: body[0].time_in_min,
+      wakeupTimeoutIsLoading: false,
+      connectionTimeout: body[1].time_in_min,
+      connectionTimeoutIsLoading: false,
+      downloadTimeout: body[2].time_in_min,
+      downloadTimeoutIsLoading: false,
+      shutdownTimeout: body[3].time_in_min,
+      shutdownTimeoutIsLoading: false,
+    });
+
+  }
+
+  updateTimeout = async (timeout_id: string, time_in_min: number) => {
+
+    fetch(this.server + ':5000/api/timeouts/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        timeout_id: timeout_id,
+        time_in_min: time_in_min,
+      }),
+    })
+
+  }
+
+
+  handleChangeWakeupTimeoutSubmit = async () => {
+    const MIN_WAKEUP_TIMEOUT = 1;
+    const MAX_WAKEUP_TIMEOUT = 10;
+    const timeoutValue = this.state.wakeupTimeout;
+
+    if (timeoutValue !== undefined && typeof timeoutValue === 'number' && timeoutValue <= MAX_WAKEUP_TIMEOUT && timeoutValue >= MIN_WAKEUP_TIMEOUT) {
+      this.setState({ wakeupTimeoutIsLoading: true });
+      await this.updateTimeout('wakeup', timeoutValue);
+      // Gives visual cue for database saving
+      setTimeout(() => {
+        this.setState({ wakeupTimeoutIsLoading: false });
+      }, 1000);
+    } else {
+      console.log("Invalid input")
+    }
+  }
+
+  handleChangeConnectionTimeoutSubmit = async () => {
+    const MIN_CONNECTION_TIMEOUT = 1;
+    const MAX_CONNECTION_TIMEOUT = 10;
+    const timeoutValue = this.state.connectionTimeout;
+
+    if (timeoutValue !== undefined && typeof timeoutValue === 'number' && timeoutValue <= MAX_CONNECTION_TIMEOUT && timeoutValue >= MIN_CONNECTION_TIMEOUT) {
+      this.setState({ connectionTimeoutIsLoading: true });
+      await this.updateTimeout('connection', timeoutValue);
+      // Gives visual cue for database saving
+      setTimeout(() => {
+        this.setState({ connectionTimeoutIsLoading: false });
+      }, 1000);
+    } else {
+      console.log("Invalid input")
+    }
+
+  }
+
+  handleChangeDownloadTimeoutSubmit = async () => {
+    const MIN_DOWNLOAD_TIMEOUT = 5;
+    const MAX_DOWNLOAD_TIMEOUT = 30;
+    const timeoutValue = this.state.downloadTimeout;
+
+    if (timeoutValue !== undefined && typeof timeoutValue === 'number' && timeoutValue <= MAX_DOWNLOAD_TIMEOUT && timeoutValue >= MIN_DOWNLOAD_TIMEOUT) {
+      this.setState({ downloadTimeoutIsLoading: true });
+      await this.updateTimeout('download', timeoutValue);
+
+      // Gives visual cue for database saving
+      setTimeout(() => {
+        this.setState({ downloadTimeoutIsLoading: false });
+      }, 1000);
+    } else {
+      console.log("Invalid input")
+    }
+
+
+  }
+
+  handleChangeShutdownTimeoutSubmit = async () => {
+    const MIN_SHUTDOWN_TIMEOUT = 1;
+    const MAX_SHUTDOWN_TIMEOUT = 10;
+    const timeoutValue = this.state.shutdownTimeout;
+
+    if (timeoutValue !== undefined && typeof timeoutValue === 'number' && timeoutValue <= MAX_SHUTDOWN_TIMEOUT && timeoutValue >= MIN_SHUTDOWN_TIMEOUT) {
+      this.setState({ shutdownTimeoutIsLoading: true });
+      await this.updateTimeout('shutdown', timeoutValue);
+      // Gives visual cue for database saving
+      setTimeout(() => {
+        this.setState({ shutdownTimeoutIsLoading: false });
+      }, 1000);
+    } else {
+      console.log("Invalid input")
+    }
+
+    // TODO remove this when real DB call is set up
+    setTimeout(() => {
+      this.setState({ shutdownTimeoutIsLoading: false });
+    }, 3000);
+  }
 
   render() {
 
@@ -119,6 +264,110 @@ class Advanced extends Component<Props, State> {
                loading={this.state.logDeleteIsLoading}/>
             </Popconfirm>
           </ButtonGroup>
+        ]
+      },
+      {
+        title: 'Configure Wakeup Timeout',
+        description: 'Set maximum allowed wakeup time (1-10 min.) Recommended: 4 min.',
+        action: [
+          <Form layout="inline">
+            <Form.Item>
+              <InputNumber
+                min={1}
+                max={10}
+                value={this.state.wakeupTimeout}
+                disabled={this.state.wakeupTimeoutIsLoading}
+                onChange={(value: any) => {this.setState({ wakeupTimeout: value});}} />
+            </Form.Item>
+            <Form.Item style={{ marginRight: 0}}>
+            <Popconfirm title="Are you sure?" onConfirm={(e: any) => {e.preventDefault(); e.stopPropagation(); this.handleChangeWakeupTimeoutSubmit();}} okText="Yes" cancelText="No">
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={this.state.wakeupTimeoutIsLoading}>
+                Save
+              </Button>
+            </Popconfirm>
+            </Form.Item>
+          </Form>
+        ]
+      },
+      {
+        title: 'Configure Connection Timeout',
+        description: 'Set maximum time to connect to data station (1-10 min.) Recommended: 4 min.',
+        action: [
+          <Form layout="inline">
+            <Form.Item>
+              <InputNumber
+                min={1}
+                max={10}
+                value={this.state.connectionTimeout}
+                disabled={this.state.connectionTimeoutIsLoading}
+                onChange={(value: any) => {this.setState({ connectionTimeout: value});}} />
+            </Form.Item>
+            <Form.Item style={{ marginRight: 0}}>
+            <Popconfirm title="Are you sure?" onConfirm={(e: any) => {e.preventDefault(); e.stopPropagation(); this.handleChangeConnectionTimeoutSubmit();}} okText="Yes" cancelText="No">
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={this.state.connectionTimeoutIsLoading}>
+                Save
+              </Button>
+            </Popconfirm>
+            </Form.Item>
+          </Form>
+        ]
+      },
+      {
+        title: 'Configure Download Timeout',
+        description: 'Set maximum allowed download time (5-30 min.) Recommended: 10 min.',
+        action: [
+          <Form layout="inline" onSubmit={(e: any) => {e.preventDefault(); e.stopPropagation(); this.handleChangeDownloadTimeoutSubmit();}}>
+            <Form.Item>
+              <InputNumber
+                min={5}
+                max={30}
+                value={this.state.downloadTimeout}
+                disabled={this.state.downloadTimeoutIsLoading}
+                onChange={(value: any) => {this.setState({ downloadTimeout: value});}} />
+            </Form.Item>
+            <Form.Item style={{ marginRight: 0}}>
+            <Popconfirm title="Are you sure?" onConfirm={(e: any) => {e.preventDefault(); e.stopPropagation(); this.handleChangeDownloadTimeoutSubmit();}} okText="Yes" cancelText="No">
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={this.state.downloadTimeoutIsLoading}>
+                Save
+              </Button>
+            </Popconfirm>
+            </Form.Item>
+          </Form>
+        ]
+      },
+      {
+        title: 'Configure Shutdown Timeout',
+        description: 'Set maximum allowed shutdown time (1-10 min.) Recommended: 2 min.',
+        action: [
+          <Form layout="inline">
+            <Form.Item>
+              <InputNumber
+                min={1}
+                max={10}
+                value={this.state.shutdownTimeout}
+                disabled={this.state.shutdownTimeoutIsLoading}
+                onChange={(value: any) => {this.setState({ shutdownTimeout: value});}} />
+            </Form.Item>
+            <Form.Item style={{ marginRight: 0}}>
+            <Popconfirm title="Are you sure?" onConfirm={(e: any) => {e.preventDefault(); e.stopPropagation(); this.handleChangeShutdownTimeoutSubmit();}} okText="Yes" cancelText="No">
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={this.state.shutdownTimeoutIsLoading}>
+                Save
+              </Button>
+            </Popconfirm>
+            </Form.Item>
+          </Form>
         ]
       },
       {
